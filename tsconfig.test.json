@@ -1,8 +1,0 @@
-{
-  "compilerOptions": {
-    "module": "ESNext",
-    "types": ["vitest/globals"]
-  },
-  "include": ["**/*.test.ts", "**/*.test.tsx"],
-  "exclude": ["node_modules", "dist"]
-}
