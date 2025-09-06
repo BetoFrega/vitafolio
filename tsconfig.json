@@ -1,5 +1,8 @@
 {
-    "compilerOptions": {
-        "types": ["vitest/globals"]
+  "compilerOptions": {
+    "types": ["vitest/globals"],
+    "paths": {
+      "@lib/shared": ["./lib/shared/src/index.ts"]
     }
+  }
 }

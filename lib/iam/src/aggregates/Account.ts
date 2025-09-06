@@ -1,5 +1,5 @@
+import { Email } from "@lib/shared";
 import { AccountId } from "../value-objects/AccountId";
-import { Email } from "../value-objects/Email";
 import { Credential } from "./Credential";
 
 export interface MFAConfig {

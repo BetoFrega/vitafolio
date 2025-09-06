@@ -1,10 +1,9 @@
 import { CreateAccountUseCase } from "./CreateAccountUseCase";
 import { Account } from "../aggregates/Account";
 import { AccountId } from "../value-objects/AccountId";
-import { Email } from "../value-objects/Email";
 import { Credential } from "../aggregates/Credential";
 import { AccountRepository } from "../ports/AccountRepository";
-import { EventBus } from "../ports/EventBus";
+import { Email } from "@lib/shared";
 
 describe(CreateAccountUseCase, () => {
   it("should create and save an account", async () => {
