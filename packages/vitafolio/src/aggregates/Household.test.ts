@@ -3,17 +3,17 @@ import { Household } from "./Household";
 
 describe(Household, () => {
   it("should create a household instance", () => {
-    const adminUser = new User({
+    const adminUser = User.create({
       fullName: "John Doe",
       email: "john.doe@example.com",
     });
 
-    const memberUser = new User({
+    const memberUser = User.create({
       fullName: "Jane Doe",
       email: "jane.doe@example.com",
     });
 
-    const household = new Household({
+    const household = Household.create({
       name: "Doe Family",
       members: [
         { user: adminUser, role: "admin" },

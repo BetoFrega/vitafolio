@@ -12,12 +12,12 @@ describe(CreateHouseholdUseCase, () => {
       mockHouseholdRepository,
     );
 
-    const adminUser = new User({
+    const adminUser = User.create({
       fullName: "John Doe",
       email: "john.doe@example.com",
     });
 
-    const memberUser = new User({
+    const memberUser = User.create({
       fullName: "Jane Doe",
       email: "jane.doe@example.com",
     });

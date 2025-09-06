@@ -5,7 +5,7 @@ export class CreateUserUseCase {
   constructor(private userRepository: UserRepository) {}
 
   async execute(data: { fullName: string; email: string }): Promise<User> {
-    const user = new User(data);
+    const user = User.create(data);
     await this.userRepository.save(user);
     return user;
   }

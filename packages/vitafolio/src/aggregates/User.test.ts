@@ -2,7 +2,7 @@ import { User } from "./User";
 
 describe(User, () => {
   it("should create a user instance", () => {
-    const user = new User({
+    const user = User.create({
       fullName: "John Doe",
       email: "john.doe@example.com",
     });

@@ -8,5 +8,11 @@ export interface HouseholdMember {
 }
 
 export class Household {
-  constructor(public data: { name: string; members: HouseholdMember[] }) {}
+  private constructor(
+    public data: { name: string; members: HouseholdMember[] },
+  ) {}
+
+  static create(data: { name: string; members: HouseholdMember[] }): Household {
+    return new Household(data);
+  }
 }

@@ -8,7 +8,7 @@ export class CreateHouseholdUseCase {
     name: string;
     members: HouseholdMember[];
   }): Promise<Household> {
-    const household = new Household(data);
+    const household = Household.create(data);
     await this.householdRepository.save(household);
     return household;
   }
