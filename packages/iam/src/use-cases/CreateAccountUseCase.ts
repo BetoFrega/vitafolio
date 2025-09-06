@@ -1,0 +1,44 @@
+import { Account } from "../aggregates/Account";
+import { AccountId } from "../value-objects/AccountId";
+import { Email } from "../value-objects/Email";
+import { Credential } from "../aggregates/Credential";
+import { AccountRepository } from "../ports/AccountRepository";
+import { EventBus } from "../ports/EventBus";
+
+export class CreateAccountUseCase {
+  constructor(
+    private accountRepository: AccountRepository,
+    private eventBus: EventBus,
+  ) {}
+
+  async execute(input: {
+    accountId: AccountId;
+    email: Email;
+    credential: Credential;
+  }): Promise<Account> {
+    // Check if email already exists
+    const emailExists = await this.accountRepository.existsByEmail(input.email);
+    if (emailExists) {
+      throw new Error("Email already exists");
+    }
+
+    // Create the account
+    const account = Account.create(
+      input.accountId,
+      input.email,
+      input.credential,
+    );
+
+    // Save the account
+    await this.accountRepository.save(account);
+
+    // Publish domain events
+    const events = account.getDomainEvents();
+    if (events.length > 0) {
+      await this.eventBus.publishAll([...events]);
+      account.clearDomainEvents();
+    }
+
+    return account;
+  }
+}
