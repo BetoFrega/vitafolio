@@ -1,4 +1,4 @@
-import { DomainEvent } from '../aggregates/DomainEvents';
+import { DomainEvent } from "../aggregates/DomainEvents";
 
 export interface EventBus {
   publish(event: DomainEvent): Promise<void>;
