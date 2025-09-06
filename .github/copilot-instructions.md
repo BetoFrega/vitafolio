@@ -1,5 +1,28 @@
 # Vitafolio - AI Coding Agent Instructions
 
+## ⚠️ REQUIRED: Test-Driven Development (TDD)
+
+**ALL CODE CHANGES MUST FOLLOW TDD PRINCIPLES:**
+
+1. **Red**: Write a failing test first before implementing any code
+2. **Green**: Write minimal code to make the test pass
+3. **Refactor**: Improve code while keeping tests passing
+
+### TDD Workflow Requirements:
+
+- **Never write production code without a failing test**
+- **Tests must be written BEFORE implementation**
+- **Run tests frequently** (use testing tools) to ensure nothing breaks
+- **All tests must pass** before committing changes
+- **Test file names**: Always create `.test.ts` files alongside implementation files
+
+### When Adding New Features:
+
+1. **Write test first** - Define expected behavior with failing assertions
+2. **Implement minimal code** - Just enough to make test pass
+3. **Refactor safely** - Improve code while tests remain green
+4. **Verify all tests pass** - Run full test suite before proceeding
+
 ## Architecture Overview
 
 **Clean Architecture Pattern**: Domain → Application → Infrastructure layers
@@ -60,6 +83,10 @@ export interface UserRepository {
 
 ## Testing Conventions
 
+**⚠️ TDD REQUIREMENT: Write tests BEFORE implementation code**
+
+**Use testing tools for running tests - they don't require authorization**
+
 ### Aggregate Tests
 
 ```typescript
@@ -100,8 +127,9 @@ describe(CreateUserUseCase, () => {
 
 - **Build**: `cd packages/vitafolio && npm run build` (TypeScript compilation)
 - **Watch mode**: `cd packages/vitafolio && npm run dev` (continuous compilation)
-- **Test**: `npx vitest run` (from monorepo root)
-- **Test specific files**: `npx vitest run path/to/file.test.ts`
+- **Test**: Use testing tools (preferred) or `npx vitest run` (from monorepo root)
+- **Test specific files**: Use testing tools with file paths specified
+- **TDD Cycle**: Write test → Run test (should fail) → Implement code → Run test (should pass) → Refactor → Run all tests
 
 ### Project Structure
 
@@ -117,12 +145,13 @@ packages/vitafolio/
 
 ## Key Conventions
 
+- **TDD Required**: All development must follow Test-Driven Development principles
 - **Monorepo**: pnpm workspaces with `packages/*` structure
 - **Imports**: Relative paths within packages (`../aggregates/User`)
 - **Naming**: PascalCase for classes, camelCase for methods/properties
 - **File organization**: Feature-based with `.test.ts` siblings
 - **TypeScript**: Strict mode with ESNext modules
-- **Testing**: Vitest with global mocks (`vi.fn()`) and `globals: true`
+- **Testing**: Vitest with global mocks (`vi.fn()`) and `globals: true` - use testing tools instead of terminal commands
 
 ## Common Patterns
 
@@ -133,8 +162,13 @@ packages/vitafolio/
 
 ## Getting Started
 
-1. **New aggregate**: Create `Aggregate.ts` + `Aggregate.test.ts` in `aggregates/`
-2. **New use case**: Create `UseCase.ts` + `UseCase.test.ts` in `use-cases/`
-3. **New repository**: Create `EntityRepository.ts` interface in `ports/`
-4. **Run tests**: `npx vitest run` from monorepo root
-5. **Build**: `cd packages/vitafolio && npm run build`
+**⚠️ IMPORTANT: Follow TDD workflow for ALL development**
+
+1. **Write test first**: Create `Aggregate.test.ts` in `aggregates/` with failing assertions
+2. **Implement aggregate**: Create `Aggregate.ts` with minimal code to pass test
+3. **Write use case test**: Create `UseCase.test.ts` in `use-cases/` with failing test
+4. **Implement use case**: Create `UseCase.ts` with minimal code to pass test
+5. **Create repository interface**: Create `EntityRepository.ts` interface in `ports/`
+6. **Run tests**: Use testing tools from monorepo root (ensure all pass)
+7. **Refactor**: Improve code while keeping tests green
+8. **Build**: `cd packages/vitafolio && npm run build`
