@@ -1,4 +1,4 @@
-import { UserRepository } from "../adapters/UserRepository";
+import { UserRepository } from "../ports/UserRepository";
 import { CreateUserUseCase } from "./CreateUserUseCase";
 
 describe(CreateUserUseCase, () => {

@@ -1,5 +1,5 @@
 import { Household, HouseholdMember } from "../aggregates/Household";
-import { HouseholdRepository } from "../adapters/HouseholdRepository";
+import { HouseholdRepository } from "../ports/HouseholdRepository";
 
 export class CreateHouseholdUseCase {
   constructor(private householdRepository: HouseholdRepository) {}

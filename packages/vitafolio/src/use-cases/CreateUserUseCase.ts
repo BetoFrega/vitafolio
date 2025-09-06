@@ -1,5 +1,5 @@
 import { User } from "../aggregates/User";
-import { UserRepository } from "../adapters/UserRepository";
+import { UserRepository } from "../ports/UserRepository";
 
 export class CreateUserUseCase {
   constructor(private userRepository: UserRepository) {}

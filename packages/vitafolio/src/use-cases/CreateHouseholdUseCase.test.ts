@@ -1,5 +1,5 @@
 import { User } from "../aggregates/User";
-import { HouseholdRepository } from "../adapters/HouseholdRepository";
+import { HouseholdRepository } from "../ports/HouseholdRepository";
 import { CreateHouseholdUseCase } from "./CreateHouseholdUseCase";
 
 describe(CreateHouseholdUseCase, () => {
