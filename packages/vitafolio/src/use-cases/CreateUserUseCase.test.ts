@@ -1,5 +1,6 @@
 import { UserRepository } from "../ports/UserRepository";
 import { CreateUserUseCase } from "./CreateUserUseCase";
+import { Email } from "../value-objects/Email";
 
 describe(CreateUserUseCase, () => {
   it("should create and save a user", async () => {
@@ -14,7 +15,8 @@ describe(CreateUserUseCase, () => {
     const user = await createUserUseCase.execute(userData);
 
     expect(user.data.fullName).toBe("Jane Doe");
-    expect(user.data.email).toBe("jane.doe@example.com");
+    expect(user.data.email).toBeInstanceOf(Email);
+    expect(user.data.email.getValue()).toBe("jane.doe@example.com");
     expect(mockUserRepository.save).toHaveBeenCalledWith(user);
   });
 });

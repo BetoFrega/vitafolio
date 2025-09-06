@@ -28,6 +28,7 @@
 **Clean Architecture Pattern**: Domain → Application → Infrastructure layers
 
 - `aggregates/` - Domain entities (User, Household) with immutable data structures
+- `value-objects/` - Immutable value objects (Email) with validation and behavior
 - `use-cases/` - Application logic orchestrating domain operations
 - `ports/` - Infrastructure ports (repository interfaces) for external dependencies
 
@@ -37,18 +38,56 @@
 
 ```typescript
 export class User {
-  private constructor(public data: { fullName: string; email: string }) {}
+  private constructor(public data: { fullName: string; email: Email }) {}
 
   static create(data: { fullName: string; email: string }): User {
-    return new User(data);
+    return new User({
+      fullName: data.fullName,
+      email: Email.create(data.email),
+    });
   }
 }
 ```
 
 - Private constructors with static factory methods
 - Immutable data passed via constructor
-- No business logic in aggregates - pure data containers
+- Use value objects for domain concepts (Email, etc.)
 - Reference: `packages/vitafolio/src/aggregates/User.ts`
+
+### Value Objects
+
+```typescript
+export class Email {
+  private constructor(private readonly value: string) {}
+
+  static create(value: string): Email {
+    const trimmedValue = value.toLowerCase().trim();
+    if (!Email.isValid(trimmedValue)) {
+      throw new Error("Invalid email format");
+    }
+    return new Email(trimmedValue);
+  }
+
+  static isValid(value: string): boolean {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(value);
+  }
+
+  getValue(): string {
+    return this.value;
+  }
+
+  equals(other: Email): boolean {
+    return this.value === other.value;
+  }
+}
+```
+
+- Immutable objects with no identity
+- Identified by their values, not ID
+- Private constructors with validation in static factory methods
+- Rich behavior and domain logic
+- Reference: `packages/vitafolio/src/value-objects/Email.ts`
 
 ### Use Cases
 
@@ -137,6 +176,7 @@ describe(CreateUserUseCase, () => {
 packages/vitafolio/
 ├── src/
 │   ├── aggregates/     # Domain entities
+│   ├── value-objects/  # Immutable value objects
 │   ├── use-cases/      # Application logic
 │   └── ports/          # Infrastructure ports (interfaces)
 ├── package.json        # Package-specific scripts
@@ -157,18 +197,21 @@ packages/vitafolio/
 
 - **Entity relationships**: Use direct object references (e.g., `HouseholdMember.user: User`)
 - **Role-based access**: String literal union types (`"admin" | "member"`)
+- **Value objects**: Use for immutable domain concepts (Email) with validation and behavior
 - **Error handling**: Not yet implemented - use cases throw on repository failures
-- **Validation**: Not yet implemented - assume valid input in use cases
+- **Validation**: Implemented in value objects - assume valid input in use cases
 
 ## Getting Started
 
 **⚠️ IMPORTANT: Follow TDD workflow for ALL development**
 
-1. **Write test first**: Create `Aggregate.test.ts` in `aggregates/` with failing assertions
-2. **Implement aggregate**: Create `Aggregate.ts` with minimal code to pass test
-3. **Write use case test**: Create `UseCase.test.ts` in `use-cases/` with failing test
-4. **Implement use case**: Create `UseCase.ts` with minimal code to pass test
-5. **Create repository interface**: Create `EntityRepository.ts` interface in `ports/`
-6. **Run tests**: Use testing tools from monorepo root (ensure all pass)
-7. **Refactor**: Improve code while keeping tests green
-8. **Build**: `cd packages/vitafolio && npm run build`
+1. **Write test first**: Create `ValueObject.test.ts` in `value-objects/` with failing assertions
+2. **Implement value object**: Create `ValueObject.ts` with minimal code to pass test
+3. **Write test first**: Create `Aggregate.test.ts` in `aggregates/` with failing assertions
+4. **Implement aggregate**: Create `Aggregate.ts` with minimal code to pass test
+5. **Write use case test**: Create `UseCase.test.ts` in `use-cases/` with failing test
+6. **Implement use case**: Create `UseCase.ts` with minimal code to pass test
+7. **Create repository interface**: Create `EntityRepository.ts` interface in `ports/`
+8. **Run tests**: Use testing tools from monorepo root (ensure all pass)
+9. **Refactor**: Improve code while keeping tests green
+10. **Build**: `cd packages/vitafolio && npm run build`
