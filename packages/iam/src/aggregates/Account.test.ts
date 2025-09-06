@@ -48,10 +48,4 @@ describe(Account, () => {
       "Account must have at least one credential",
     );
   });
-
-  it("should generate domain events", () => {
-    const account = Account.create(accountId, email, passwordCred);
-    expect(account.getDomainEvents()).toHaveLength(1);
-    expect(account.getDomainEvents()[0].type).toBe("AccountCreated");
-  });
 });

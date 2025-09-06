@@ -22,12 +22,12 @@ export class VerifyEmailUseCase {
     // Save the updated account
     await this.accountRepository.save(verifiedAccount);
 
-    // Publish domain events
-    const events = verifiedAccount.getDomainEvents();
-    if (events.length > 0) {
-      await this.eventBus.publishAll([...events]);
-      verifiedAccount.clearDomainEvents();
-    }
+    // Publish domain event
+    await this.eventBus.publish({
+      type: "AccountEmailVerified",
+      accountId: accountId.getValue(),
+      verifiedAt: verifiedAccount.emailVerifiedAt!,
+    });
 
     return verifiedAccount;
   }

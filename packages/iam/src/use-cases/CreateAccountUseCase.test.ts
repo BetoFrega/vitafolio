@@ -22,7 +22,7 @@ describe(CreateAccountUseCase, () => {
 
     const mockEventBus = {
       publish: vi.fn().mockResolvedValue(undefined),
-      publishAll: vi.fn().mockResolvedValue(undefined),
+      publishAll: vi.fn(),
     };
 
     const useCase = new CreateAccountUseCase(mockRepo, mockEventBus);
@@ -31,7 +31,7 @@ describe(CreateAccountUseCase, () => {
     expect(account).toBeInstanceOf(Account);
     expect(account.accountId).toEqual(accountId);
     expect(mockRepo.save).toHaveBeenCalledWith(account);
-    expect(mockEventBus.publishAll).toHaveBeenCalled();
+    expect(mockEventBus.publish).toHaveBeenCalled(); // Updated to publish
   });
 
   it("should throw error if email already exists", async () => {

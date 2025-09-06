@@ -23,7 +23,7 @@ describe(VerifyEmailUseCase, () => {
 
     const mockEventBus = {
       publish: vi.fn().mockResolvedValue(undefined),
-      publishAll: vi.fn().mockResolvedValue(undefined),
+      publishAll: vi.fn(),
     };
 
     const useCase = new VerifyEmailUseCase(mockRepo, mockEventBus);
@@ -32,7 +32,7 @@ describe(VerifyEmailUseCase, () => {
     expect(verifiedAccount.status).toBe("active");
     expect(verifiedAccount.emailVerifiedAt).toBeInstanceOf(Date);
     expect(mockRepo.save).toHaveBeenCalledWith(verifiedAccount);
-    expect(mockEventBus.publishAll).toHaveBeenCalled();
+    expect(mockEventBus.publish).toHaveBeenCalled(); // Updated to publish
   });
 
   it("should throw error if account not found", async () => {

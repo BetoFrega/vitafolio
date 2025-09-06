@@ -32,12 +32,12 @@ export class CreateAccountUseCase {
     // Save the account
     await this.accountRepository.save(account);
 
-    // Publish domain events
-    const events = account.getDomainEvents();
-    if (events.length > 0) {
-      await this.eventBus.publishAll([...events]);
-      account.clearDomainEvents();
-    }
+    // Publish domain event
+    await this.eventBus.publish({
+      type: "AccountCreated",
+      accountId: input.accountId.getValue(),
+      primaryEmail: input.email.getValue(),
+    });
 
     return account;
   }
