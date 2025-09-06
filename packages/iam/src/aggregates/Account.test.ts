@@ -44,7 +44,7 @@ describe(Account, () => {
   });
 
   it("should throw error when creating without credential", () => {
-    expect(() => Account.create(accountId, email)).toThrow(
+    expect(() => Account.create(accountId, email, undefined)).toThrow(
       "Account must have at least one credential",
     );
   });
