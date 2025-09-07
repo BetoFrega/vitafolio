@@ -32,7 +32,9 @@ describe("RegisterAccount", () => {
     });
 
     expect(result.isSuccess()).toBe(true);
-    expect(deps.hashService.hash).toHaveBeenCalledWith("password");
+    expect(deps.hashService.hash).toHaveBeenCalledWith(
+      expect.objectContaining({ value: "password" }),
+    );
     expect(deps.repository.createUser).toHaveBeenCalledWith(expect.any(User));
 
     // Verify the user entity has the correct data
@@ -46,7 +48,7 @@ describe("RegisterAccount", () => {
     deps.hashService.hash = vi.fn().mockRejectedValue(new Error("hash fail"));
     const uc = new RegisterAccount(deps);
 
-    const result = await uc.execute({ email: "a@b.com", password: "p" });
+    const result = await uc.execute({ email: "a@b.com", password: "password" });
 
     expect(result.isFailure()).toBe(true);
     expect(result.getError().message).toBe("hash fail");
@@ -59,7 +61,7 @@ describe("RegisterAccount", () => {
       .mockRejectedValue(new Error("db fail"));
     const uc = new RegisterAccount(deps);
 
-    const result = await uc.execute({ email: "a@b.com", password: "p" });
+    const result = await uc.execute({ email: "a@b.com", password: "password" });
 
     expect(result.isFailure()).toBe(true);
     expect(result.getError().message).toBe("db fail");
