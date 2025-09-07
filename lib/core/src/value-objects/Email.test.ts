@@ -13,9 +13,13 @@ describe(Email, () => {
     });
 
     it("should throw error for invalid email format", () => {
-      expect(() => Email.create("invalid-email")).toThrow("Invalid email format");
+      expect(() => Email.create("invalid-email")).toThrow(
+        "Invalid email format",
+      );
       expect(() => Email.create("")).toThrow("Invalid email format");
-      expect(() => Email.create("@example.com")).toThrow("Invalid email format");
+      expect(() => Email.create("@example.com")).toThrow(
+        "Invalid email format",
+      );
       expect(() => Email.create("user@")).toThrow("Invalid email format");
     });
   });
