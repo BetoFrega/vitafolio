@@ -1,6 +1,6 @@
 import { Account } from "../aggregates/Account";
 import { AccountId } from "../value-objects/AccountId";
-import { Email } from "../value-objects/Email";
+import { Email } from "@lib/shared";
 
 export interface AccountRepository {
   save(account: Account): Promise<void>;

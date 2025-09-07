@@ -8,7 +8,5 @@ export {
   type CredentialData,
 } from "./aggregates/Credential";
 export type { DomainEvent, AccountStatus } from "./aggregates/DomainEvents";
-export type { MFAConfig } from "./aggregates/Account";
 export type { AccountRepository } from "./ports/AccountRepository";
 export { CreateAccountUseCase } from "./use-cases/CreateAccountUseCase";
-export { VerifyEmailUseCase } from "./use-cases/VerifyEmailUseCase";

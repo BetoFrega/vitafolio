@@ -1,8 +1,11 @@
-enum CredentialKind {
+export enum CredentialKind {
   Password = "password",
 }
 
-type CredentialData = { kind: CredentialKind.Password; passwordHash: string };
+export type CredentialData = {
+  kind: CredentialKind.Password;
+  passwordHash: string;
+};
 
 export class Credential {
   private constructor(

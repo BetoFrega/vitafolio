@@ -2,8 +2,10 @@
   "compilerOptions": {
     "esModuleInterop": true,
     "types": ["vitest/globals"],
+    "skipLibCheck": true,
     "paths": {
       "@lib/shared": ["./lib/shared/src/index.ts"]
     }
-  }
+  },
+  "exclude": ["node_modules", "dist", ".pnpm", "/node_modules/"]
 }

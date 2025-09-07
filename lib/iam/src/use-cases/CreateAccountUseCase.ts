@@ -34,8 +34,11 @@ export class CreateAccountUseCase {
     // Publish domain event
     await this.eventBus.publish({
       type: "AccountCreated",
-      accountId: input.accountId.getValue(),
-      primaryEmail: input.email.getValue(),
+      occurredAt: new Date(),
+      payload: {
+        accountId: input.accountId.getValue(),
+        primaryEmail: input.email.getValue(),
+      },
     });
 
     return account;
