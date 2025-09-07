@@ -27,32 +27,58 @@
 
 **Clean Architecture Pattern**: Domain → Application → Infrastructure layers
 
-- `aggregates/` - Domain entities (User, Household) with immutable data structures
-- `value-objects/` - Immutable value objects (Email) with validation and behavior
-- `use-cases/` - Application logic orchestrating domain operations
+- `domain/` - Domain entities (User) with immutable data structures
+- `app/` - Application use cases implementing business workflows
 - `ports/` - Infrastructure ports (repository interfaces) for external dependencies
+- `adapters/` - Infrastructure implementations of ports
 
 ## Core Patterns
 
-### Domain Aggregates
+### Domain Entities
 
 ```typescript
 export class User {
-  private constructor(public data: { fullName: string; email: Email }) {}
+  private constructor(
+    public readonly data: {
+      id: string;
+      email: string;
+      hashedPassword: string;
+      salt: string;
+      createdAt: Date;
+    },
+  ) {
+    // Make data readonly by freezing it
+    Object.freeze(this.data);
+  }
 
-  static create(data: { fullName: string; email: string }): User {
+  static create(data: {
+    id: string;
+    email: string;
+    hashedPassword: string;
+    salt: string;
+  }): User {
     return new User({
-      fullName: data.fullName,
-      email: Email.create(data.email),
+      ...data,
+      createdAt: new Date(),
     });
+  }
+
+  static fromData(data: {
+    id: string;
+    email: string;
+    hashedPassword: string;
+    salt: string;
+    createdAt: Date;
+  }): User {
+    return new User(data);
   }
 }
 ```
 
 - Private constructors with static factory methods
-- Immutable data passed via constructor
-- Use value objects for domain concepts (Email, etc.)
-- Reference: `packages/vitafolio/src/aggregates/User.ts`
+- Immutable data with readonly properties and Object.freeze()
+- Separate factory methods for creation and reconstruction
+- Reference: `lib/iam/domain/User.ts`
 
 ### Value Objects
 
@@ -87,38 +113,62 @@ export class Email {
 - Identified by their values, not ID
 - Private constructors with validation in static factory methods
 - Rich behavior and domain logic
-- Reference: `packages/vitafolio/src/value-objects/Email.ts`
+- Reference: `lib/shared/value-objects/Email.ts` (when created)
 
 ### Use Cases
 
 ```typescript
-export class CreateUserUseCase {
-  constructor(private userRepository: UserRepository) {}
-  async execute(data: { fullName: string; email: string }): Promise<User> {
-    const user = User.create(data);
-    await this.userRepository.save(user);
-    return user;
+export class RegisterAccount implements UseCase<Input> {
+  constructor(
+    private readonly deps: {
+      repository: Pick<UserRepository, "createUser">;
+      hashService: Pick<HashService, "hash" | "makeSalt" | "randomUUID">;
+    },
+  ) {}
+
+  async execute(input: Input): Promise<Result<void>> {
+    try {
+      const { email, password } = input;
+      const salt = await this.deps.hashService.makeSalt();
+      const passwordHash = await this.deps.hashService.hash(password + salt);
+
+      await this.deps.repository.createUser({
+        id: await this.deps.hashService.randomUUID(),
+        email,
+        hashedPassword: passwordHash,
+        salt,
+      });
+
+      return Result.success(undefined);
+    } catch (error) {
+      return Result.failure(error as Error);
+    }
   }
 }
 ```
 
-- Dependency injection via constructor
+- Implement UseCase interface with execute method
+- Use Result pattern for error handling
+- Dependency injection via constructor with Pick utility types
 - Single responsibility per use case
-- Async operations with repository interfaces
-- Use static factory methods to create aggregates
-- Reference: `packages/vitafolio/src/use-cases/CreateUserUseCase.ts`
+- Reference: `lib/iam/app/RegisterAccount.ts`
 
 ### Repository Pattern
 
 ```typescript
 export interface UserRepository {
-  save(user: User): Promise<void>;
+  createUser(data: {
+    id: string;
+    email: string;
+    hashedPassword: string;
+    salt: string;
+  }): Promise<void>;
 }
 ```
 
 - Interface-based design for testability
 - Async operations for all data access
-- Reference: `packages/vitafolio/src/ports/UserRepository.ts`
+- Reference: `lib/iam/ports/UserRepository.ts`
 
 ## Testing Conventions
 
@@ -132,25 +182,35 @@ export interface UserRepository {
 describe(User, () => {
   it("should create a user instance", () => {
     const user = User.create({
-      fullName: "John Doe",
+      id: "123",
       email: "john@example.com",
+      hashedPassword: "hashedpwd",
+      salt: "salt123",
     });
-    expect(user.data.fullName).toBe("John Doe");
+    expect(user.data.email).toBe("john@example.com");
   });
 });
 ```
 
 - Use static factory methods to create aggregate instances
 - Focus on data structure validation
-- Reference: `packages/vitafolio/src/aggregates/User.test.ts`
+- Reference: `lib/iam/domain/User.test.ts`
 
 ### Use Case Tests
 
 ```typescript
-describe(CreateUserUseCase, () => {
-  it("should create and save a user", async () => {
-    const mockRepo = { save: vi.fn().mockResolvedValue(undefined) };
-    const useCase = new CreateUserUseCase(mockRepo);
+describe(RegisterAccount, () => {
+  it("should register a new account", async () => {
+    const mockRepo = { createUser: vi.fn().mockResolvedValue(undefined) };
+    const mockHashService = {
+      hash: vi.fn().mockResolvedValue("hashedpassword"),
+      makeSalt: vi.fn().mockResolvedValue("salt123"),
+      randomUUID: vi.fn().mockResolvedValue("user-id-123"),
+    };
+    const useCase = new RegisterAccount({
+      repository: mockRepo,
+      hashService: mockHashService,
+    });
     // ... test execution and assertions
   });
 });
@@ -158,36 +218,43 @@ describe(CreateUserUseCase, () => {
 
 - Mock repository interfaces using `vi.fn()`
 - Test complete workflow from input to repository call
-- Reference: `packages/vitafolio/src/use-cases/CreateUserUseCase.test.ts`
+- Reference: `lib/iam/app/RegisterAccount.test.ts`
 
 ## Development Workflow
 
 ### Build & Test Commands
 
-- **Build**: `cd packages/vitafolio && npm run build` (TypeScript compilation)
-- **Watch mode**: `cd packages/vitafolio && npm run dev` (continuous compilation)
-- **Test**: Use testing tools (preferred) or `npx vitest run` (from monorepo root)
+- **Build**: `pnpm run typecheck` (TypeScript compilation check)
+- **Development**: `pnpm run dev` (starts development server)
+- **Test**: Use testing tools (preferred) or `pnpm test` (from monorepo root)
 - **Test specific files**: Use testing tools with file paths specified
 - **TDD Cycle**: Write test → Run test (should fail) → Implement code → Run test (should pass) → Refactor → Run all tests
 
 ### Project Structure
 
 ```text
-packages/vitafolio/
-├── src/
-│   ├── aggregates/     # Domain entities
-│   ├── value-objects/  # Immutable value objects
-│   ├── use-cases/      # Application logic
-│   └── ports/          # Infrastructure ports (interfaces)
-├── package.json        # Package-specific scripts
+vitafolio/
+├── app/                # Application entry point and HTTP layer
+│   ├── main.ts         # Application bootstrap
+│   ├── http/           # Express.js HTTP adapters
+│   └── ports/          # Application-level ports
+├── lib/                # Domain and application logic
+│   ├── iam/            # Identity and Access Management domain
+│   │   ├── domain/     # Domain entities (User)
+│   │   ├── app/        # Application use cases
+│   │   ├── ports/      # Infrastructure ports
+│   │   └── adapters/   # Infrastructure implementations
+│   └── shared/         # Shared kernel
+│       └── app/        # Shared application contracts (Result, UseCase)
+├── package.json        # Monorepo scripts and dependencies
 └── tsconfig.json       # TypeScript config
 ```
 
 ## Key Conventions
 
 - **TDD Required**: All development must follow Test-Driven Development principles
-- **Monorepo**: pnpm workspaces with `packages/*` structure
-- **Imports**: Relative paths within packages (`../aggregates/User`)
+- **Monorepo**: Single workspace structure with lib/ and app/ directories
+- **Imports**: Use path aliases (`@shared/`, `@iam/`) for cross-module imports
 - **Naming**: PascalCase for classes, camelCase for methods/properties
 - **File organization**: Feature-based with `.test.ts` siblings
 - **TypeScript**: Strict mode with ESNext modules
@@ -205,13 +272,12 @@ packages/vitafolio/
 
 **⚠️ IMPORTANT: Follow TDD workflow for ALL development**
 
-1. **Write test first**: Create `ValueObject.test.ts` in `value-objects/` with failing assertions
-2. **Implement value object**: Create `ValueObject.ts` with minimal code to pass test
-3. **Write test first**: Create `Aggregate.test.ts` in `aggregates/` with failing assertions
-4. **Implement aggregate**: Create `Aggregate.ts` with minimal code to pass test
-5. **Write use case test**: Create `UseCase.test.ts` in `use-cases/` with failing test
-6. **Implement use case**: Create `UseCase.ts` with minimal code to pass test
-7. **Create repository interface**: Create `EntityRepository.ts` interface in `ports/`
-8. **Run tests**: Use testing tools from monorepo root (ensure all pass)
-9. **Refactor**: Improve code while keeping tests green
-10. **Build**: `cd packages/vitafolio && npm run build`
+1. **Write test first**: Create `Entity.test.ts` in `domain/` with failing assertions
+2. **Implement entity**: Create `Entity.ts` with minimal code to pass test
+3. **Write test first**: Create `UseCase.test.ts` in `app/` with failing test
+4. **Implement use case**: Create `UseCase.ts` with minimal code to pass test
+5. **Create repository interface**: Create `EntityRepository.ts` interface in `ports/`
+6. **Create adapter**: Create implementation in `adapters/` if needed
+7. **Run tests**: Use testing tools from monorepo root (ensure all pass)
+8. **Refactor**: Improve code while keeping tests green
+9. **Build**: `pnpm run typecheck`
