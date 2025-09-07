@@ -6,7 +6,21 @@ type Input = {
 };
 
 export class RegisterAccount implements UseCase<Input> {
+  constructor(
+    private readonly deps: {
+      repository: {
+        createUser: (email: string, passwordHash: string, salt: string) => Promise<void>;
+      };
+      hashService: {
+        hash: (password: string) => Promise<string>;
+        makeSalt: () => Promise<string>;
+      };
+    },
+  ) {}
   async execute(input: Input) {
-    console.log(`Registrando conta para o email: ${input.email}`);
+    const { email, password } = input;
+    const salt = await this.deps.hashService.makeSalt();
+    const passwordHash = await this.deps.hashService.hash(password + salt);
+    await this.deps.repository.createUser(email, passwordHash, salt);
   }
 }
