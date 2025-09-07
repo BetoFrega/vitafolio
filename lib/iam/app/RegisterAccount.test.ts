@@ -1,4 +1,6 @@
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import { RegisterAccount } from "./RegisterAccount";
+import { User } from "../domain/User";
 
 type Deps = ConstructorParameters<typeof RegisterAccount>[0];
 
@@ -31,13 +33,13 @@ describe("RegisterAccount", () => {
 
     expect(result.isSuccess()).toBe(true);
     expect(deps.hashService.hash).toHaveBeenCalledWith("password");
-    expect(deps.repository.createUser).toHaveBeenCalledWith(
-      expect.objectContaining({
-        email: "test@example.com",
-        hashedPassword: "hashed",
-        id: expect.any(String),
-      }),
-    );
+    expect(deps.repository.createUser).toHaveBeenCalledWith(expect.any(User));
+
+    // Verify the user entity has the correct data
+    const userEntity = deps.repository.createUser.mock.calls[0]?.[0] as User;
+    expect(userEntity.data.email).toBe("test@example.com");
+    expect(userEntity.data.hashedPassword).toBe("hashed");
+    expect(userEntity.data.id).toBe("unique-id");
   });
 
   it("should return failure when hash fails and not call createUser", async () => {

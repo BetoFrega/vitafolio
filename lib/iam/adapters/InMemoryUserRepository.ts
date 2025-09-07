@@ -1,5 +1,5 @@
 import { User } from "../domain/User";
-import type { CreateUserData, UserRepository } from "../ports/UserRepository";
+import type { UserRepository } from "../ports/UserRepository";
 
 interface StoredUser {
   id: string;
@@ -11,20 +11,22 @@ interface StoredUser {
 export class InMemoryUserRepository implements UserRepository {
   private users = new Map<string, StoredUser>();
 
-  async createUser(data: CreateUserData): Promise<void> {
-    if (this.users.has(data.id)) {
-      throw new Error(`User with id ${data.id} already exists`);
+  async createUser(user: User): Promise<void> {
+    if (this.users.has(user.data.id)) {
+      throw new Error(`User with id ${user.data.id} already exists`);
     }
 
-    for (const user of this.users.values()) {
-      if (user.email === data.email) {
-        throw new Error(`User with email ${data.email} already exists`);
+    for (const userData of this.users.values()) {
+      if (userData.email === user.data.email) {
+        throw new Error(`User with email ${user.data.email} already exists`);
       }
     }
 
-    this.users.set(data.id, {
-      ...data,
-      createdAt: new Date(),
+    this.users.set(user.data.id, {
+      id: user.data.id,
+      email: user.data.email,
+      hashedPassword: user.data.hashedPassword,
+      createdAt: user.data.createdAt,
     });
   }
 

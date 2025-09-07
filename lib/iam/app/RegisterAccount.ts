@@ -2,6 +2,7 @@ import type { UseCase } from "@shared/app/contracts/UseCase";
 import { Result } from "@shared/app/contracts/Result";
 import type { UserRepository } from "../ports/UserRepository";
 import type { HashService } from "../ports/HashService";
+import { User } from "../domain/User";
 
 type Input = {
   email: string;
@@ -19,12 +20,15 @@ export class RegisterAccount implements UseCase<Input> {
     try {
       const { email, password } = input;
       const passwordHash = await this.deps.hashService.hash(password);
+      const id = await this.deps.hashService.randomUUID();
 
-      await this.deps.repository.createUser({
-        id: await this.deps.hashService.randomUUID(),
+      const user = User.create({
+        id,
         email,
         hashedPassword: passwordHash,
       });
+
+      await this.deps.repository.createUser(user);
 
       return Result.success(undefined);
     } catch (error) {
