@@ -33,7 +33,10 @@ export default defineConfig([
   },
   {
     files: ["**/*.md"],
-    plugins: { markdown },
+    plugins: {
+      // @ts-expect-error - Known issue with types https://github.com/eslint/markdown/issues/402
+      markdown: markdown,
+    },
     language: "markdown/gfm",
     extends: ["markdown/recommended"],
   },
