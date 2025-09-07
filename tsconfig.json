@@ -17,8 +17,11 @@
 
     "lib": ["ES2023"],
     "baseUrl": ".",
-    "paths": {},
-    "types": ["node"]
+    "paths": {
+      "@shared/*": ["./lib/shared/*"]
+    },
+    "types": ["node", "vitest/globals"]
   },
+
   "exclude": ["dist", "build", "node_modules"]
 }

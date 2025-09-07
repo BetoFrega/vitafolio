@@ -1,9 +1,11 @@
-import express from "express";
+import { RegisterAccount } from "lib/iam/app/RegisterAccount";
+import { startExpressServer } from "./http/express/startExpressServer";
+import type { Deps } from "./ports/Deps";
 
-const app = express();
-app.use(express.json());
+const registerAccount = new RegisterAccount();
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+const deps: Deps = {
+  registerAccount: registerAccount.execute.bind(registerAccount),
+};
+
+startExpressServer(deps);
