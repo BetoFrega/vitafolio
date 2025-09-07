@@ -24,6 +24,7 @@ const login = new Login({
 
 const deps: Deps = {
   registerAccount: registerAccount.execute.bind(registerAccount),
+  login: login.execute.bind(login),
 };
 const { app } = makeExpressApp(deps);
 
