@@ -1,11 +1,14 @@
 import { makeExpressApp } from "app/http/express/makeExpressApp";
 import supertest from "supertest";
 import Express from "express";
+import type { Deps } from "app/ports/Deps";
 
 describe("Service Health", () => {
   let app: Express.Application;
+  let deps: Deps;
   beforeEach(() => {
-    ({ app } = makeExpressApp({ registerAccount: async () => {} }));
+    deps = {} as Deps;
+    ({ app } = makeExpressApp(deps));
   });
 
   describe("/health - Health check", () => {
