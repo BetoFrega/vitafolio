@@ -3,7 +3,20 @@ import { makeExpressApp } from "./http/express/makeExpressApp";
 import type { Deps } from "./ports/Deps";
 import * as http from "http";
 
-const registerAccount = new RegisterAccount();
+// Mock implementations for now - these should be replaced with real implementations
+const mockRepository = {
+  createUser: async () => {},
+};
+
+const mockHashService = {
+  makeSalt: async () => "mock-salt",
+  hash: async (password: string) => `hashed-${password}`,
+};
+
+const registerAccount = new RegisterAccount({
+  repository: mockRepository,
+  hashService: mockHashService,
+});
 
 const deps: Deps = {
   registerAccount: registerAccount.execute.bind(registerAccount),

@@ -1,4 +1,5 @@
 import type { UseCase } from "@shared/app/contracts/UseCase";
+import { Result } from "@shared/app/contracts/Result";
 import type { UserRepository } from "../ports/UserRepository";
 import type { HashService } from "../ports/HashService";
 
@@ -14,10 +15,15 @@ export class RegisterAccount implements UseCase<Input> {
       hashService: Pick<HashService, "hash" | "makeSalt">;
     },
   ) {}
-  async execute(input: Input) {
-    const { email, password } = input;
-    const salt = await this.deps.hashService.makeSalt();
-    const passwordHash = await this.deps.hashService.hash(password + salt);
-    await this.deps.repository.createUser(email, passwordHash, salt);
+  async execute(input: Input): Promise<Result<void>> {
+    try {
+      const { email, password } = input;
+      const salt = await this.deps.hashService.makeSalt();
+      const passwordHash = await this.deps.hashService.hash(password + salt);
+      await this.deps.repository.createUser(email, passwordHash, salt);
+      return Result.success(undefined);
+    } catch (error) {
+      return Result.failure(error as Error);
+    }
   }
 }

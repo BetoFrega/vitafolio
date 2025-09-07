@@ -12,8 +12,13 @@ export const makeUserRegistrationHandler: RequestHandlerFactory<
   ) => {
     const { email, password } = req.body;
     try {
-      await deps.registerAccount({ email, password });
-      res.status(201).json({ message: "Account registered successfully" });
+      const result = await deps.registerAccount({ email, password });
+
+      if (result.isSuccess()) {
+        res.status(201).json({ message: "Account registered successfully" });
+      } else {
+        res.status(400).json({ error: result.getError().message });
+      }
     } catch (error) {
       next(error);
     }

@@ -24,8 +24,12 @@ describe("RegisterAccount", () => {
   it("should create a user with hashed password and salt", async () => {
     const uc = new RegisterAccount(deps);
 
-    await uc.execute({ email: "test@example.com", password: "password" });
+    const result = await uc.execute({
+      email: "test@example.com",
+      password: "password",
+    });
 
+    expect(result.isSuccess()).toBe(true);
     expect(deps.hashService.makeSalt).toHaveBeenCalled();
     expect(deps.hashService.hash).toHaveBeenCalledWith("password" + "salt");
     expect(deps.repository.createUser).toHaveBeenCalledWith(
@@ -35,26 +39,28 @@ describe("RegisterAccount", () => {
     );
   });
 
-  it("should propagate errors from makeSalt and not call createUser", async () => {
+  it("should return failure when makeSalt fails and not call createUser", async () => {
     deps.hashService.makeSalt = vi
       .fn()
       .mockRejectedValue(new Error("salt fail"));
     const uc = new RegisterAccount(deps);
 
-    await expect(
-      uc.execute({ email: "a@b.com", password: "p" }),
-    ).rejects.toThrow("salt fail");
+    const result = await uc.execute({ email: "a@b.com", password: "p" });
+
+    expect(result.isFailure()).toBe(true);
+    expect(result.getError().message).toBe("salt fail");
     expect(deps.repository.createUser).not.toHaveBeenCalled();
   });
 
-  it("should propagate errors from repository.createUser", async () => {
+  it("should return failure when repository.createUser fails", async () => {
     deps.repository.createUser = vi
       .fn()
       .mockRejectedValue(new Error("db fail"));
     const uc = new RegisterAccount(deps);
 
-    await expect(
-      uc.execute({ email: "a@b.com", password: "p" }),
-    ).rejects.toThrow("db fail");
+    const result = await uc.execute({ email: "a@b.com", password: "p" });
+
+    expect(result.isFailure()).toBe(true);
+    expect(result.getError().message).toBe("db fail");
   });
 });
