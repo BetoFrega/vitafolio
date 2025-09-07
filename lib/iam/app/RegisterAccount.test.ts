@@ -1,18 +1,6 @@
-import { RegisterAccount } from "@iam/app/RegisterAccount";
+import { RegisterAccount } from "./RegisterAccount";
 
-type Deps = {
-  repository: {
-    createUser: (
-      email: string,
-      passwordHash: string,
-      salt: string,
-    ) => Promise<void>;
-  };
-  hashService: {
-    hash: (password: string) => Promise<string>;
-    makeSalt: () => Promise<string>;
-  };
-};
+type Deps = ConstructorParameters<typeof RegisterAccount>[0];
 
 describe("RegisterAccount", () => {
   let deps: {
@@ -34,7 +22,7 @@ describe("RegisterAccount", () => {
   });
 
   it("should create a user with hashed password and salt", async () => {
-    const uc = new RegisterAccount(deps as Deps);
+    const uc = new RegisterAccount(deps);
 
     await uc.execute({ email: "test@example.com", password: "password" });
 
@@ -51,7 +39,7 @@ describe("RegisterAccount", () => {
     deps.hashService.makeSalt = vi
       .fn()
       .mockRejectedValue(new Error("salt fail"));
-    const uc = new RegisterAccount(deps as Deps);
+    const uc = new RegisterAccount(deps);
 
     await expect(
       uc.execute({ email: "a@b.com", password: "p" }),
@@ -63,7 +51,7 @@ describe("RegisterAccount", () => {
     deps.repository.createUser = vi
       .fn()
       .mockRejectedValue(new Error("db fail"));
-    const uc = new RegisterAccount(deps as Deps);
+    const uc = new RegisterAccount(deps);
 
     await expect(
       uc.execute({ email: "a@b.com", password: "p" }),

@@ -1,4 +1,6 @@
 import type { UseCase } from "@shared/app/contracts/UseCase";
+import type { UserRepository } from "../ports/UserRepository";
+import type { HashService } from "../ports/HashService";
 
 type Input = {
   email: string;
@@ -8,13 +10,8 @@ type Input = {
 export class RegisterAccount implements UseCase<Input> {
   constructor(
     private readonly deps: {
-      repository: {
-        createUser: (email: string, passwordHash: string, salt: string) => Promise<void>;
-      };
-      hashService: {
-        hash: (password: string) => Promise<string>;
-        makeSalt: () => Promise<string>;
-      };
+      repository: Pick<UserRepository, "createUser">;
+      hashService: Pick<HashService, "hash" | "makeSalt">;
     },
   ) {}
   async execute(input: Input) {
