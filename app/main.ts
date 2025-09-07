@@ -8,6 +8,7 @@ import * as http from "http";
 const mockHashService = {
   makeSalt: async () => "mock-salt",
   hash: async (password: string) => `hashed-${password}`,
+  randomUUID: async () => `mock-uuid-${Date.now()}`,
 };
 
 // Real in-memory user repository
