@@ -1,20 +1,24 @@
 {
   "compilerOptions": {
-    "target": "ES2022",
+    "target": "esnext",
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "verbatimModuleSyntax": true,
+    "allowSyntheticDefaultImports": true,
+    "isolatedModules": true,
+
     "strict": true,
-    "skipLibCheck": true,
-    "resolveJsonModule": true,
     "exactOptionalPropertyTypes": true,
     "noUncheckedIndexedAccess": true,
     "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
     "useDefineForClassFields": true,
+
+    "lib": ["ES2023"],
     "baseUrl": ".",
-    "paths": {
-      "~/*": ["./src/*"]
-    }
+    "paths": {},
+    "types": ["node"]
   },
-  "exclude": ["node_modules", "dist", ".pnpm", "/node_modules/"]
+  "exclude": ["dist", "build", "node_modules"]
 }
