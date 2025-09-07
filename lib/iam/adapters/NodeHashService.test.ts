@@ -1,4 +1,5 @@
 import { NodeHashService } from "./NodeHashService";
+import { NewPassword } from "../domain/value-objects/NewPassword";
 
 describe("NodeHashService", () => {
   let hashService: NodeHashService;
@@ -9,18 +10,18 @@ describe("NodeHashService", () => {
 
   describe("hash", () => {
     it("should hash a password with bcrypt", async () => {
-      const password = "testPassword123";
+      const password = NewPassword.create("testPassword123");
 
       const hashedPassword = await hashService.hash(password);
 
       expect(hashedPassword).toBeDefined();
       expect(typeof hashedPassword).toBe("string");
-      expect(hashedPassword).not.toBe(password);
+      expect(hashedPassword).not.toBe(password.getValue());
       expect(hashedPassword.length).toBeGreaterThan(0);
     });
 
     it("should produce different hashes for the same password on different calls", async () => {
-      const password = "testPassword123";
+      const password = NewPassword.create("testPassword123");
 
       const hash1 = await hashService.hash(password);
       const hash2 = await hashService.hash(password);
@@ -31,16 +32,19 @@ describe("NodeHashService", () => {
 
   describe("verify", () => {
     it("should verify a correct password against its hash", async () => {
-      const password = "testPassword123";
+      const password = NewPassword.create("testPassword123");
       const hashedPassword = await hashService.hash(password);
 
-      const isValid = await hashService.verify(password, hashedPassword);
+      const isValid = await hashService.verify(
+        password.getValue(),
+        hashedPassword,
+      );
 
       expect(isValid).toBe(true);
     });
 
     it("should reject an incorrect password", async () => {
-      const password = "testPassword123";
+      const password = NewPassword.create("testPassword123");
       const wrongPassword = "wrongPassword456";
       const hashedPassword = await hashService.hash(password);
 
@@ -50,13 +54,13 @@ describe("NodeHashService", () => {
     });
 
     it("should work with different hashes of the same password", async () => {
-      const password = "testPassword123";
+      const password = NewPassword.create("testPassword123");
       const hash1 = await hashService.hash(password);
       const hash2 = await hashService.hash(password);
 
       // Both hashes should verify the same password even though they're different
-      expect(await hashService.verify(password, hash1)).toBe(true);
-      expect(await hashService.verify(password, hash2)).toBe(true);
+      expect(await hashService.verify(password.getValue(), hash1)).toBe(true);
+      expect(await hashService.verify(password.getValue(), hash2)).toBe(true);
       expect(hash1).not.toBe(hash2); // Confirm hashes are different
     });
 
@@ -94,17 +98,17 @@ describe("NodeHashService", () => {
 
   describe("integration with RegisterAccount pattern", () => {
     it("should work with direct password hashing (bcrypt handles salting internally)", async () => {
-      const password = "userPassword123";
+      const password = NewPassword.create("userPassword123");
 
       const hashedPassword = await hashService.hash(password);
       const isValidPassword = await hashService.verify(
-        password,
+        password.getValue(),
         hashedPassword,
       );
 
       expect(hashedPassword).toBeDefined();
       expect(typeof hashedPassword).toBe("string");
-      expect(hashedPassword).not.toBe(password);
+      expect(hashedPassword).not.toBe(password.getValue());
       expect(isValidPassword).toBe(true);
     });
   });
