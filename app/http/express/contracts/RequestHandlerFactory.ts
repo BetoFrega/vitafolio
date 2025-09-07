@@ -1,4 +1,6 @@
-import type { Deps } from "app/ports/Deps";
 import type Express from "express";
 
-export type RequestHandlerFactory = (deps: Deps) => Express.RequestHandler;
+// Allow handlers to declare a narrower dependency subset via a generic.
+export type RequestHandlerFactory<LocalDeps = unknown> = (
+  deps: LocalDeps,
+) => Express.RequestHandler;

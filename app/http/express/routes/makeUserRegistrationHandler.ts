@@ -1,10 +1,10 @@
-import type { Deps } from "app/ports/Deps";
+import type { RegisterAccountDeps } from "app/ports/Deps";
 import Express from "express";
 import type { RequestHandlerFactory } from "../contracts/RequestHandlerFactory";
 
-export const makeUserRegistrationHandler: RequestHandlerFactory = (
-  deps: Deps,
-) => {
+export const makeUserRegistrationHandler: RequestHandlerFactory<
+  RegisterAccountDeps
+> = (deps: RegisterAccountDeps) => {
   return async (
     req: Express.Request,
     res: Express.Response,
