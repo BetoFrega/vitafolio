@@ -1,7 +1,14 @@
+import type { User } from "../domain/User";
+
+export interface CreateUserData {
+  id: string;
+  email: string;
+  hashedPassword: string;
+  salt: string;
+}
+
 export interface UserRepository {
-  createUser: (
-    email: string,
-    passwordHash: string,
-    salt: string,
-  ) => Promise<void>;
+  createUser: (data: CreateUserData) => Promise<void>;
+  findByEmail: (email: string) => Promise<User | null>;
+  findById: (id: string) => Promise<User | null>;
 }

@@ -8,6 +8,7 @@ describe("RegisterAccount", () => {
     hashService: {
       hash: ReturnType<typeof vi.fn>;
       makeSalt: ReturnType<typeof vi.fn>;
+      randomUUID: ReturnType<typeof vi.fn>;
     };
   } & Deps;
 
@@ -17,6 +18,7 @@ describe("RegisterAccount", () => {
       hashService: {
         makeSalt: vi.fn().mockResolvedValue("salt"),
         hash: vi.fn().mockResolvedValue("hashed"),
+        randomUUID: vi.fn().mockResolvedValue("unique-id"),
       },
     } as unknown as typeof deps;
   });
@@ -33,9 +35,12 @@ describe("RegisterAccount", () => {
     expect(deps.hashService.makeSalt).toHaveBeenCalled();
     expect(deps.hashService.hash).toHaveBeenCalledWith("password" + "salt");
     expect(deps.repository.createUser).toHaveBeenCalledWith(
-      "test@example.com",
-      "hashed",
-      "salt",
+      expect.objectContaining({
+        email: "test@example.com",
+        hashedPassword: "hashed",
+        salt: "salt",
+        id: expect.any(String),
+      }),
     );
   });
 
