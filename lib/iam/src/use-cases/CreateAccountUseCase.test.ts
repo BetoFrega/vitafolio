@@ -17,7 +17,7 @@ describe(CreateAccountUseCase, () => {
       findByEmail: vi.fn(),
       existsByEmail: vi.fn().mockResolvedValue(false),
       delete: vi.fn(),
-    };
+    } as AccountRepository;
 
     const mockEventBus = {
       publish: vi.fn().mockResolvedValue(undefined),

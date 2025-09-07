@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "esModuleInterop": true,
     "types": ["vitest/globals"],
     "paths": {
       "@lib/shared": ["./lib/shared/src/index.ts"]

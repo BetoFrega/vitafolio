@@ -1,4 +1,4 @@
-import { Credential, CredentialKind } from "./Credential";
+import { Credential } from "./Credential";
 
 describe(Credential, () => {
   it("should create a password credential", () => {

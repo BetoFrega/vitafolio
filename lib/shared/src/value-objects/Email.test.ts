@@ -17,4 +17,9 @@ describe(Email, () => {
     const b = Email.create("A@B.CO");
     expect(a.equals(b)).toBe(true);
   });
+
+  it("rejects emails with control characters for safety", () => {
+    expect(Email.isValid('"user\x01"@example.com')).toBe(false);
+    expect(Email.isValid("user\x01@example.com")).toBe(false);
+  });
 });

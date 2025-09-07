@@ -1,6 +1,8 @@
-export type CredentialKind = "password";
+enum CredentialKind {
+  Password = "password",
+}
 
-export type CredentialData = { kind: "password"; passwordHash: string };
+type CredentialData = { kind: CredentialKind.Password; passwordHash: string };
 
 export class Credential {
   private constructor(
@@ -8,20 +10,16 @@ export class Credential {
     private readonly data: CredentialData,
   ) {}
 
-  static create(
-    kind: CredentialKind,
-    data: Omit<CredentialData, "kind">,
-  ): Credential {
-    return new Credential(kind, { ...data, kind } as CredentialData);
-  }
-
   static createPassword(passwordHash: string): Credential {
-    return new Credential("password", { kind: "password", passwordHash });
+    return new Credential(CredentialKind.Password, {
+      kind: CredentialKind.Password,
+      passwordHash,
+    });
   }
 
   getPasswordHash(): string | undefined {
-    return this.kind === "password"
-      ? (this.data as any).passwordHash
+    return this.kind === CredentialKind.Password
+      ? this.data.passwordHash
       : undefined;
   }
 

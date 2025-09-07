@@ -172,7 +172,7 @@ describe(CreateUserUseCase, () => {
 
 ### Project Structure
 
-```
+```text
 packages/vitafolio/
 ├── src/
 │   ├── aggregates/     # Domain entities
