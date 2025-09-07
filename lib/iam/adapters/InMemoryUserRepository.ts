@@ -5,7 +5,6 @@ interface StoredUser {
   id: string;
   email: string;
   hashedPassword: string;
-  salt: string;
   createdAt: Date;
 }
 
@@ -17,7 +16,6 @@ export class InMemoryUserRepository implements UserRepository {
       throw new Error(`User with id ${data.id} already exists`);
     }
 
-    // Check for duplicate email
     for (const user of this.users.values()) {
       if (user.email === data.email) {
         throw new Error(`User with email ${data.email} already exists`);

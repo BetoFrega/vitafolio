@@ -47,7 +47,6 @@ export class User {
       createdAt: Date;
     },
   ) {
-    // Make data readonly by freezing it
     Object.freeze(this.data);
   }
 
@@ -204,7 +203,6 @@ describe(RegisterAccount, () => {
     const mockRepo = { createUser: vi.fn().mockResolvedValue(undefined) };
     const mockHashService = {
       hash: vi.fn().mockResolvedValue("hashedpassword"),
-      makeSalt: vi.fn().mockResolvedValue("salt123"),
       randomUUID: vi.fn().mockResolvedValue("user-id-123"),
     };
     const useCase = new RegisterAccount({

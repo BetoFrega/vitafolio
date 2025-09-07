@@ -7,7 +7,6 @@ describe(User, () => {
       id: "user-123",
       email: "john@example.com",
       hashedPassword: "hashed-password",
-      salt: "salt-123",
     };
 
     const user = User.create(userData);
@@ -15,7 +14,6 @@ describe(User, () => {
     expect(user.data.id).toBe("user-123");
     expect(user.data.email).toBe("john@example.com");
     expect(user.data.hashedPassword).toBe("hashed-password");
-    expect(user.data.salt).toBe("salt-123");
     expect(user.data.createdAt).toBeInstanceOf(Date);
   });
 
@@ -25,7 +23,6 @@ describe(User, () => {
       id: "user-123",
       email: "john@example.com",
       hashedPassword: "hashed-password",
-      salt: "salt-123",
       createdAt,
     };
 
@@ -34,7 +31,6 @@ describe(User, () => {
     expect(user.data.id).toBe("user-123");
     expect(user.data.email).toBe("john@example.com");
     expect(user.data.hashedPassword).toBe("hashed-password");
-    expect(user.data.salt).toBe("salt-123");
     expect(user.data.createdAt).toBe(createdAt);
   });
 
@@ -43,7 +39,6 @@ describe(User, () => {
       id: "user-123",
       email: "john@example.com",
       hashedPassword: "hashed-password",
-      salt: "salt-123",
     });
 
     expect(() => {

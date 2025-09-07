@@ -17,10 +17,6 @@ export class NodeHashService implements HashService {
     }
   }
 
-  async makeSalt(): Promise<string> {
-    return crypto.randomBytes(16).toString("hex");
-  }
-
   async randomUUID(): Promise<string> {
     return crypto.randomUUID();
   }

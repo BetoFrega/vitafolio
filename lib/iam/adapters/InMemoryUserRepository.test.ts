@@ -14,7 +14,6 @@ describe(InMemoryUserRepository, () => {
         id: "user-123",
         email: "john@example.com",
         hashedPassword: "hashed-password",
-        salt: "salt-123",
       };
 
       await repository.createUser(createUserData);
@@ -23,7 +22,6 @@ describe(InMemoryUserRepository, () => {
       expect(foundUser).not.toBeNull();
       expect(foundUser!.data.email).toBe("john@example.com");
       expect(foundUser!.data.hashedPassword).toBe("hashed-password");
-      expect(foundUser!.data.salt).toBe("salt-123");
     });
 
     it("should throw error when creating user with duplicate id", async () => {
@@ -31,7 +29,6 @@ describe(InMemoryUserRepository, () => {
         id: "user-123",
         email: "john@example.com",
         hashedPassword: "hashed-password",
-        salt: "salt-123",
       };
 
       await repository.createUser(createUserData);
@@ -49,14 +46,12 @@ describe(InMemoryUserRepository, () => {
         id: "user-123",
         email: "john@example.com",
         hashedPassword: "hashed-password",
-        salt: "salt-123",
       };
 
       const createUserData2 = {
         id: "user-456",
         email: "john@example.com",
         hashedPassword: "different-hash",
-        salt: "different-salt",
       };
 
       await repository.createUser(createUserData1);
@@ -73,7 +68,6 @@ describe(InMemoryUserRepository, () => {
         id: "user-123",
         email: "john@example.com",
         hashedPassword: "hashed-password",
-        salt: "salt-123",
       };
 
       await repository.createUser(createUserData);
@@ -96,7 +90,6 @@ describe(InMemoryUserRepository, () => {
         id: "user-123",
         email: "john@example.com",
         hashedPassword: "hashed-password",
-        salt: "salt-123",
       };
 
       await repository.createUser(createUserData);
@@ -119,7 +112,6 @@ describe(InMemoryUserRepository, () => {
         id: "user-1",
         email: "user1@example.com",
         hashedPassword: "hash1",
-        salt: "salt1",
       });
 
       expect(repository.size()).toBe(1);
@@ -134,8 +126,7 @@ describe(InMemoryUserRepository, () => {
         id: "user-1",
         email: "user1@example.com",
         hashedPassword: "hash1",
-        salt: "salt1",
-      });
+        });
 
       expect(repository.size()).toBe(1);
 
@@ -143,7 +134,6 @@ describe(InMemoryUserRepository, () => {
         id: "user-2",
         email: "user2@example.com",
         hashedPassword: "hash2",
-        salt: "salt2",
       });
 
       expect(repository.size()).toBe(2);

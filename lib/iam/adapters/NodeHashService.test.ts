@@ -71,30 +71,6 @@ describe("NodeHashService", () => {
     });
   });
 
-  describe("makeSalt", () => {
-    it("should generate a random salt", async () => {
-      const salt = await hashService.makeSalt();
-
-      expect(salt).toBeDefined();
-      expect(typeof salt).toBe("string");
-      expect(salt.length).toBeGreaterThan(0);
-    });
-
-    it("should generate different salts on each call", async () => {
-      const salt1 = await hashService.makeSalt();
-      const salt2 = await hashService.makeSalt();
-
-      expect(salt1).not.toBe(salt2);
-    });
-
-    it("should generate salt with proper length", async () => {
-      const salt = await hashService.makeSalt();
-
-      // Standard salt length for bcrypt-style operations
-      expect(salt.length).toBe(32); // 16 bytes as hex string
-    });
-  });
-
   describe("randomUUID", () => {
     it("should generate a valid UUID v4", async () => {
       const uuid = await hashService.randomUUID();
@@ -116,17 +92,20 @@ describe("NodeHashService", () => {
     });
   });
 
-  describe("integration with password + salt pattern", () => {
-    it("should work with the RegisterAccount pattern (password + salt)", async () => {
+  describe("integration with RegisterAccount pattern", () => {
+    it("should work with direct password hashing (bcrypt handles salting internally)", async () => {
       const password = "userPassword123";
-      const salt = await hashService.makeSalt();
 
-      const hashedPasswordWithSalt = await hashService.hash(password + salt);
+      const hashedPassword = await hashService.hash(password);
+      const isValidPassword = await hashService.verify(
+        password,
+        hashedPassword,
+      );
 
-      expect(hashedPasswordWithSalt).toBeDefined();
-      expect(typeof hashedPasswordWithSalt).toBe("string");
-      expect(hashedPasswordWithSalt).not.toBe(password);
-      expect(hashedPasswordWithSalt).not.toBe(salt);
+      expect(hashedPassword).toBeDefined();
+      expect(typeof hashedPassword).toBe("string");
+      expect(hashedPassword).not.toBe(password);
+      expect(isValidPassword).toBe(true);
     });
   });
 });

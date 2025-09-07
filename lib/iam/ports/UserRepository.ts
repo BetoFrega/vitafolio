@@ -4,7 +4,6 @@ export interface CreateUserData {
   id: string;
   email: string;
   hashedPassword: string;
-  salt: string;
 }
 
 export interface UserRepository {
