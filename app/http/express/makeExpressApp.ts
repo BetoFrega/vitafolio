@@ -2,7 +2,7 @@ import express from "express";
 import { buildRoutes } from "./routes";
 import type { Deps } from "../../ports/Deps";
 
-export function startExpressServer(deps: Deps) {
+export function makeExpressApp(deps: Deps) {
   const app = express();
   app.use(express.json());
 
@@ -12,7 +12,5 @@ export function startExpressServer(deps: Deps) {
 
   app.use((_req, res) => res.status(404).json({ error: "Not Found" }));
 
-  app.listen(3000, () => {
-    console.log("Server is running on http://localhost:3000");
-  });
+  return { app };
 }

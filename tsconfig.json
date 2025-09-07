@@ -18,7 +18,8 @@
     "lib": ["ES2023"],
     "baseUrl": ".",
     "paths": {
-      "@shared/*": ["./lib/shared/*"]
+      "@shared/*": ["./lib/shared/*"],
+      "@iam/*": ["./lib/iam/*"]
     },
     "types": ["node", "vitest/globals"]
   },
