@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { InMemoryUserRepository } from "./InMemoryUserRepository";
-import { User } from "../domain/User";
+import { User } from "../domain/aggregates/User";
 
 describe(InMemoryUserRepository, () => {
   let repository: InMemoryUserRepository;

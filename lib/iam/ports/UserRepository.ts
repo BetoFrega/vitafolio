@@ -1,4 +1,4 @@
-import type { User } from "../domain/User";
+import type { User } from "../domain/aggregates/User";
 
 export interface UserRepository {
   createUser: (user: User) => Promise<void>;

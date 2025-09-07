@@ -1,4 +1,4 @@
-import { User } from "../domain/User";
+import { User } from "../domain/aggregates/User";
 import type { UserRepository } from "../ports/UserRepository";
 
 interface StoredUser {

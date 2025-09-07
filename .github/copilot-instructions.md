@@ -84,14 +84,16 @@
 
 ```text
 vitafolio/
-├── app/                # Application entry point and HTTP layer
-├── lib/                # Domain and application logic
-│   ├── [domain]/       # Feature-based domains (e.g., iam/)
-│   │   ├── domain/     # Domain entities and value objects
-│   │   ├── app/        # Application use cases
-│   │   ├── ports/      # Infrastructure interfaces
-│   │   └── adapters/   # Infrastructure implementations
-│   └── shared/         # Shared kernel and cross-cutting concerns
+├── app/                    # Application entry point and HTTP layer
+├── lib/                    # Domain and application logic
+│   ├── [domain]/           # Feature-based domains (e.g., iam/)
+│   │   ├── domain/         # Domain entities and value objects
+│   │   │   ├── aggregates/     # Domain aggregates (root entities with invariants)
+│   │   │   └── value-objects/  # Domain value objects (immutable, validated)
+│   │   ├── app/            # Application use cases
+│   │   ├── ports/          # Infrastructure interfaces
+│   │   └── adapters/       # Infrastructure implementations
+│   └── shared/             # Shared kernel and cross-cutting concerns
 ```
 
 ## Key Conventions

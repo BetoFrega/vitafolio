@@ -2,7 +2,7 @@ import type { UseCase } from "@shared/app/contracts/UseCase";
 import { Result } from "@shared/app/contracts/Result";
 import type { UserRepository } from "../ports/UserRepository";
 import type { HashService } from "../ports/HashService";
-import { User } from "../domain/User";
+import { User } from "../domain/aggregates/User";
 
 type Input = {
   email: string;

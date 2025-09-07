@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { RegisterAccount } from "./RegisterAccount";
-import { User } from "../domain/User";
+import { User } from "../domain/aggregates/User";
 
 type Deps = ConstructorParameters<typeof RegisterAccount>[0];
 
