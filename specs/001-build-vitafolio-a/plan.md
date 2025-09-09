@@ -278,7 +278,7 @@ app/http/express/routes/
 - 6 aggregate implementations with tests [P]
 - 10 use case implementations with tests (including schema management)
 - 6 repository interface and implementation tasks [P]
-- 17 HTTP handler implementations with tests (including 5 schema endpoints)
+- 23 HTTP handler implementations with tests (including granular schema, metadata, notification settings, and profile endpoints)
 - 4 integration test suites
 - 1 end-to-end quickstart validation
 

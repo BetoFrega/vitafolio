@@ -459,7 +459,7 @@ Retrieve specific item by ID.
 
 ### PUT /items/:id
 
-Update existing item.
+Update existing item (name and/or metadata).
 
 **Request**:
 
@@ -485,6 +485,69 @@ Update existing item.
   }
 }
 ```
+
+### PATCH /items/:id/metadata
+
+Update specific metadata fields without replacing entire metadata object.
+
+**Request**:
+
+```json
+{
+  "rating": 5,
+  "genre": "Software Engineering"
+}
+```
+
+**Response**: 200 OK
+
+```json
+{
+  "success": true,
+  "data": {
+    "item": {
+      "id": "uuid",
+      "name": "Clean Architecture",
+      "metadata": {
+        "title": "Clean Architecture",
+        "author": "Robert C. Martin",
+        "isbn": "978-0134494166",
+        "rating": 5,
+        "genre": "Software Engineering"
+      },
+      "updatedAt": "2025-09-09T10:30:00Z"
+    },
+    "updatedFields": ["rating", "genre"]
+  }
+}
+```
+
+**Errors**:
+
+- 404: Item not found
+- 400: Metadata fields don't conform to collection schema
+- 422: Field validation errors
+
+### DELETE /items/:id/metadata/:fieldName
+
+Remove a specific metadata field from an item.
+
+**Response**: 200 OK
+
+```json
+{
+  "success": true,
+  "data": {
+    "item": { ... },
+    "removedField": "isbn"
+  }
+}
+```
+
+**Errors**:
+
+- 404: Item or field not found
+- 400: Cannot remove required field
 
 ### DELETE /items/:id
 
@@ -589,21 +652,190 @@ Mark notification as read.
 }
 ```
 
+### DELETE /notifications/:id
+
+Dismiss/delete a notification.
+
+**Response**: 204 No Content
+
+**Errors**:
+
+- 404: Notification not found
+- 401: Authentication required
+
+## Notification Settings API
+
+### GET /notifications/settings
+
+Get user's notification preferences and settings.
+
+**Response**: 200 OK
+
+```json
+{
+  "success": true,
+  "data": {
+    "settings": {
+      "emailNotifications": true,
+      "inAppNotifications": true,
+      "notificationTypes": {
+        "expiration": {
+          "enabled": true,
+          "advanceWarningDays": 3,
+          "channels": ["email", "in-app"]
+        },
+        "maintenance": {
+          "enabled": true,
+          "advanceWarningDays": 7,
+          "channels": ["in-app"]
+        }
+      },
+      "quietHours": {
+        "enabled": true,
+        "startTime": "22:00",
+        "endTime": "08:00",
+        "timezone": "UTC"
+      }
+    }
+  }
+}
+```
+
+### PUT /notifications/settings
+
+Update user's notification preferences.
+
+**Request**:
+
+```json
+{
+  "emailNotifications": false,
+  "notificationTypes": {
+    "expiration": {
+      "enabled": true,
+      "advanceWarningDays": 5,
+      "channels": ["in-app"]
+    }
+  }
+}
+```
+
+**Response**: 200 OK
+
+```json
+{
+  "success": true,
+  "data": {
+    "settings": { ... }
+  }
+}
+```
+
+### POST /notifications/settings/test
+
+Send a test notification to verify settings.
+
+**Request**:
+
+```json
+{
+  "type": "expiration",
+  "channel": "email"
+}
+```
+
+**Response**: 200 OK
+
+```json
+{
+  "success": true,
+  "data": {
+    "testSent": true,
+    "channel": "email",
+    "timestamp": "2025-09-09T10:30:00Z"
+  }
+}
+```
+
 ## Error Codes
 
 - `COLLECTION_NOT_FOUND`: Collection does not exist or access denied
 - `ITEM_NOT_FOUND`: Item does not exist or access denied
+- `NOTIFICATION_NOT_FOUND`: Notification does not exist or access denied
 - `SCHEMA_FIELD_NOT_FOUND`: Metadata schema field does not exist
+- `ITEM_METADATA_FIELD_NOT_FOUND`: Item metadata field does not exist
 - `INVALID_METADATA_SCHEMA`: Metadata schema validation failed
 - `METADATA_VALIDATION_FAILED`: Item metadata doesn't conform to schema
 - `SCHEMA_INCOMPATIBLE_CHANGE`: Schema change incompatible with existing items
 - `REQUIRED_FIELD_HAS_DATA`: Cannot remove required field that contains data
 - `CANNOT_REQUIRE_FIELD_WITH_NULLS`: Cannot make field required when existing items have null values
+- `CANNOT_REMOVE_REQUIRED_METADATA`: Cannot remove required metadata field from item
 - `COLLECTION_NOT_EMPTY`: Cannot delete collection containing items
 - `DUPLICATE_COLLECTION_NAME`: Collection name already exists for user
 - `DUPLICATE_FIELD_NAME`: Schema field name already exists
+- `INVALID_NOTIFICATION_SETTINGS`: Notification settings validation failed
 - `AUTHENTICATION_REQUIRED`: Valid authentication token required
 - `INSUFFICIENT_PERMISSIONS`: User lacks permission for requested operation
+
+## User Profile API
+
+### GET /profile
+
+Get user profile information and preferences.
+
+**Response**: 200 OK
+
+```json
+{
+  "success": true,
+  "data": {
+    "user": {
+      "id": "uuid",
+      "email": "user@example.com",
+      "name": "John Doe",
+      "preferences": {
+        "defaultCollectionView": "grid",
+        "itemsPerPage": 50,
+        "timezone": "UTC",
+        "language": "en"
+      },
+      "stats": {
+        "totalCollections": 5,
+        "totalItems": 127,
+        "accountCreated": "2025-01-15T10:00:00Z"
+      }
+    }
+  }
+}
+```
+
+### PUT /profile
+
+Update user profile and preferences.
+
+**Request**:
+
+```json
+{
+  "name": "John Smith",
+  "preferences": {
+    "defaultCollectionView": "list",
+    "itemsPerPage": 25,
+    "timezone": "America/New_York"
+  }
+}
+```
+
+**Response**: 200 OK
+
+```json
+{
+  "success": true,
+  "data": {
+    "user": { ... }
+  }
+}
+```
 
 ## Rate Limiting
 

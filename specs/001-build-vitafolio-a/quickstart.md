@@ -726,6 +726,95 @@ curl -X DELETE http://localhost:3000/api/v1/collections/lib-uuid-123/schema/fiel
 }
 ```
 
+## Advanced Operations
+
+### Working with Item Metadata
+
+**Update specific metadata fields:**
+
+```bash
+curl -X PATCH http://localhost:3000/api/v1/collections/lib-uuid-123/items/item-uuid-1/metadata \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "rating": 4,
+    "notes": "Excellent book on software architecture principles"
+  }'
+```
+
+**Remove metadata fields:**
+
+```bash
+curl -X DELETE http://localhost:3000/api/v1/collections/lib-uuid-123/items/item-uuid-1/metadata \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "fields": ["notes", "oldField"]
+  }'
+```
+
+### Notification Settings Management
+
+**Get current notification settings:**
+
+```bash
+curl -X GET http://localhost:3000/api/v1/notifications/settings \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+**Update notification preferences:**
+
+```bash
+curl -X PUT http://localhost:3000/api/v1/notifications/settings \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "enableEmail": true,
+    "enablePush": false,
+    "frequency": "daily",
+    "quietHours": {
+      "start": "22:00",
+      "end": "07:00"
+    }
+  }'
+```
+
+**Test notification settings:**
+
+```bash
+curl -X POST http://localhost:3000/api/v1/notifications/settings/test \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "type": "email"
+  }'
+```
+
+### User Profile Management
+
+**Get user profile and preferences:**
+
+```bash
+curl -X GET http://localhost:3000/api/v1/profile \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+**Update user preferences:**
+
+```bash
+curl -X PUT http://localhost:3000/api/v1/profile \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "John Smith",
+    "preferences": {
+      "defaultCollectionView": "list",
+      "itemsPerPage": 25,
+      "timezone": "America/New_York"
+    }
+  }'
+```
+
 ## Success Criteria
 
 ### ✅ Collection Management
