@@ -1,50 +1,100 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+# Vitafolio Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Clean Architecture (NON-NEGOTIABLE)
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+Clean Architecture pattern strictly enforced with clear layer separation:
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+- **Domain layer**: Pure business logic, no external dependencies, immutable entities with private constructors and static factory methods
+- **Application layer**: Use cases implementing business workflows, dependency injection via Pick<> utility types
+- **Infrastructure layer**: Adapters implementing ports, external dependencies isolated here
+- **Dependency rule**: Inner layers never depend on outer layers
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### II. Test-Driven Development (NON-NEGOTIABLE)
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+TDD mandatory with Red-Green-Refactor cycle strictly enforced:
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+- **Red**: Write failing test first before any production code
+- **Green**: Write minimal code to make test pass
+- **Refactor**: Improve code while keeping tests passing
+- **No production code without failing test first**
+- **Test files**: Always create `.test.ts` files alongside implementation files
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+### III. Domain-Driven Design
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+Rich domain models with behavior and validation:
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+- **Entities**: Immutable data with Object.freeze(), rich domain behavior, private constructors
+- **Value objects**: Identified by values not identity, validation in static factory methods
+- **Aggregates**: Consistency boundaries with invariant enforcement
+- **Ubiquitous language**: Code reflects business terminology exactly
+
+### IV. Result Pattern Error Handling
+
+Explicit error handling without exceptions in business logic:
+
+- **Use Result<T, E>** for all operations that can fail
+- **Result.success()** for successful operations
+- **Result.failure()** for failures with descriptive error types
+- **No throwing exceptions** in domain or application layers
+
+### V. Interface-Based Design
+
+Dependency inversion through abstractions:
+
+- **Repository interfaces** define domain needs, not implementation details
+- **Port interfaces** for all external dependencies
+- **Async operations** for all data access
+- **Mock dependencies** using vi.fn() for isolated unit tests
+
+## Development Standards
+
+### Code Quality Requirements
+
+- **TypeScript strict mode** with ESNext modules and noEmit type checking
+- **Path aliases** for clean imports (@shared/, @iam/, @domain/)
+- **Feature-based organization** by domain/business capability
+- **Immutable data structures** with readonly properties
+- **PascalCase** for classes/interfaces, **camelCase** for methods/properties
+
+### Testing Standards
+
+- **Arrange-Act-Assert** pattern for all test structure
+- **Test behavior not implementation** - focus on inputs/outputs
+- **Integration tests** for cross-component workflows
+- **Testing tools preferred** over terminal commands for test execution
+- **All tests must pass** before any code commit
+
+## Technology Constraints
+
+### Core Technology Stack
+
+- **Runtime**: Node.js >=24.0.0 with TypeScript strict mode
+- **Package manager**: pnpm with workspace support
+- **Testing**: Vitest with vi.fn() mocking for unit tests
+- **Build tools**: tsx for development, tsc for type checking
+- **HTTP layer**: Express.js for REST API endpoints when needed
+
+### Architecture Enforcement
+
+- **No circular dependencies** between layers or modules
+- **Single responsibility** principle for all classes and use cases
+- **Dependency injection** through constructor parameters only
+- **No direct database access** from domain or application layers
+- **Port/adapter pattern** for all external integrations
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+Constitution supersedes all other development practices and must be followed without exception. All code reviews must verify compliance with these principles. Complexity that violates these rules must be justified and approved before implementation.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+Any amendments to this constitution require:
+
+1. Documentation of the change rationale
+2. Update of all dependent templates and documentation
+3. Migration plan for existing code if needed
+4. Team approval before implementation
+
+Refer to `.github/copilot-instructions.md` for detailed runtime development guidance and implementation patterns.
+
+**Version**: 1.0.0 | **Ratified**: September 9, 2025 | **Last Amended**: September 9, 2025
