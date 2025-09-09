@@ -8,7 +8,14 @@ describe("Identity and Access Management", () => {
   let app: Express.Application;
   let deps: Deps;
   beforeEach(() => {
-    deps = { registerAccount: vi.fn(), login: vi.fn() };
+    deps = {
+      registerAccount: vi.fn(),
+      login: vi.fn(),
+      // Placeholder repositories for collections (not used in IAM tests)
+      collectionRepository: {},
+      itemRepository: {},
+      notificationRepository: {},
+    };
     ({ app } = makeExpressApp(deps));
   });
 
