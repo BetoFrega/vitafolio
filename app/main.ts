@@ -25,6 +25,10 @@ const login = new Login({
 const deps: Deps = {
   registerAccount: registerAccount.execute.bind(registerAccount),
   login: login.execute.bind(login),
+  // Placeholder repositories until tasks T030-T032 are completed
+  collectionRepository: {},
+  itemRepository: {},
+  notificationRepository: {},
 };
 const { app } = makeExpressApp(deps);
 
