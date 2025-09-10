@@ -3,6 +3,7 @@ import supertest from "supertest";
 import Express from "express";
 import type { Deps } from "app/ports/Deps";
 import { createMockDeps } from "./helpers/mockDeps";
+import type { MetadataSchema } from "@collections/domain/value-objects/MetadataSchema";
 
 describe("Expiration Notifications Integration", () => {
   let app: Express.Application;
@@ -20,11 +21,12 @@ describe("Expiration Notifications Integration", () => {
     const testCollection = {
       name: "Test Expiration Collection",
       description: "Testing expiration notification functionality",
-      schema: {
-        fields: [
-          { name: "name", type: "string", required: true },
-          { name: "category", type: "string", required: true },
-        ],
+      metadataSchema: {
+        fields: {
+          name: { type: "text", required: true },
+          category: { type: "text", required: true },
+          expirationDate: { type: "date", required: true },
+        },
       },
     };
 
