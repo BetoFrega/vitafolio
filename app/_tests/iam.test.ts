@@ -3,19 +3,13 @@ import { Result } from "lib/shared/app/contracts/Result";
 import supertest from "supertest";
 import Express from "express";
 import type { Deps } from "app/ports/Deps";
+import { createMockDeps } from "./helpers/mockDeps";
 
 describe("Identity and Access Management", () => {
   let app: Express.Application;
   let deps: Deps;
   beforeEach(() => {
-    deps = {
-      registerAccount: vi.fn(),
-      login: vi.fn(),
-      // Placeholder repositories for collections (not used in IAM tests)
-      collectionRepository: {},
-      itemRepository: {},
-      notificationRepository: {},
-    };
+    deps = createMockDeps();
     ({ app } = makeExpressApp(deps));
   });
 

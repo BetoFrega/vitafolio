@@ -47,4 +47,36 @@ export class NodeTokenService implements TokenService {
       throw new Error("Failed to generate refresh token");
     }
   }
+
+  async verify(
+    token: string,
+  ): Promise<
+    | { success: true; data: { userId: string } }
+    | { success: false; error: string }
+  > {
+    try {
+      const decoded = jwt.verify(token, this.jwtSecret) as jwt.JwtPayload & {
+        userId: string;
+        type: string;
+      };
+
+      // Check if it's an access token
+      if (decoded.type !== "access") {
+        return { success: false, error: "Invalid token type" };
+      }
+
+      return {
+        success: true,
+        data: { userId: decoded.userId },
+      };
+    } catch (error) {
+      if (error instanceof jwt.TokenExpiredError) {
+        return { success: false, error: "Token expired" };
+      } else if (error instanceof jwt.JsonWebTokenError) {
+        return { success: false, error: "Invalid token" };
+      } else {
+        return { success: false, error: "Token verification failed" };
+      }
+    }
+  }
 }
