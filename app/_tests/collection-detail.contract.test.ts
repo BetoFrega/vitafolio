@@ -3,6 +3,7 @@ import supertest from "supertest";
 import Express from "express";
 import type { Deps } from "app/ports/Deps";
 import { createMockDeps } from "./helpers/mockDeps";
+import type { Mock } from "vitest";
 
 describe("Collection Detail Contract Tests", () => {
   let app: Express.Application;
@@ -11,6 +12,10 @@ describe("Collection Detail Contract Tests", () => {
   beforeEach(() => {
     deps = createMockDeps();
     ({ app } = makeExpressApp(deps));
+    (deps.tokenService.verify as Mock).mockResolvedValue({
+      success: true,
+      payload: { userId: "user-1" },
+    });
   });
 
   describe("GET /api/v1/collections/{id}", () => {

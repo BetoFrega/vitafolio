@@ -2,22 +2,14 @@ import { makeExpressApp } from "app/http/express/makeExpressApp";
 import supertest from "supertest";
 import Express from "express";
 import type { Deps } from "app/ports/Deps";
+import { createMockDeps } from "./helpers/mockDeps";
 
 describe("Item Detail API Contract Tests", () => {
   let app: Express.Application;
   let deps: Deps;
 
   beforeEach(() => {
-    deps = {
-      registerAccount: vi.fn(),
-      login: vi.fn(),
-      // Placeholder repositories until collections are implemented
-      collectionRepository: {},
-      // Placeholder repositories until collections are implemented
-      itemRepository: {},
-      // Placeholder repositories until collections are implemented
-      notificationRepository: {},
-    };
+    deps = createMockDeps();
     ({ app } = makeExpressApp(deps));
   });
 

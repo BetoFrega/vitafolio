@@ -49,6 +49,9 @@ function makeDeps(): ConstructorParameters<typeof Login>[0] {
     tokenService: {
       generateAccessToken: vi.fn().mockResolvedValue("validAccessToken"),
       generateRefreshToken: vi.fn().mockResolvedValue("validRefreshToken"),
+      verify: vi
+        .fn()
+        .mockResolvedValue({ success: true, payload: { userId: "user-1" } }),
     },
     hashService: {
       verify: vi.fn().mockImplementation((password, hashedPassword) => {
