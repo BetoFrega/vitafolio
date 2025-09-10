@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { z } from "zod";
-import { RequestValidator } from "./RequestValidator";
+import { RequestValidator, ValidationError } from "./RequestValidator";
 
 // Mock request types for testing
 interface MockRequest {
@@ -46,8 +46,19 @@ describe("RequestValidator", () => {
 
       // Assert
       expect(result.isFailure()).toBe(true);
-      expect(result.getError()).toBeInstanceOf(Error);
-      expect(result.getError().message).toContain("validation");
+      const error = result.getError();
+      expect(error).toBeInstanceOf(ValidationError);
+      expect(error.message).toContain("validation");
+
+      // Test enhanced error details
+      const validationError = error as ValidationError;
+      expect(validationError.issues).toBeInstanceOf(Array);
+      expect(validationError.issues.length).toBeGreaterThan(0);
+
+      const fieldErrors = validationError.getFieldErrors();
+      expect(fieldErrors).toHaveProperty("name");
+      expect(fieldErrors).toHaveProperty("email");
+      expect(fieldErrors).toHaveProperty("age");
     });
 
     it("should return failure result for missing required fields", () => {
