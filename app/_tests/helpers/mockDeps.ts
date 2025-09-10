@@ -58,7 +58,7 @@ export const createMockNotificationRepository = (): NotificationRepository => ({
 export const createMockTokenService = (): TokenService => ({
   generateAccessToken: vi.fn(),
   generateRefreshToken: vi.fn(),
-  verify: vi.fn(),
+  verify: vi.fn().mockImplementation(() => ({ success: true,data: { userId: "user-1" } })),
 });
 
 // Create complete mock deps for testing
