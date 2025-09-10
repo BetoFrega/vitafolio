@@ -102,7 +102,7 @@ describe("AuthenticatedHandler", () => {
       const handler = new TestAuthenticatedHandler({ message: "test" });
 
       mockRequest = {
-        user: {} as { id?: string }, // User object exists but no id
+        user: {} as { id: string }, // User object exists but no id
       };
 
       await handler.handle(
