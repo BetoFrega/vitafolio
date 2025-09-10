@@ -1,5 +1,4 @@
 import { z } from "zod";
-import type { Request } from "express";
 import { Result } from "@shared/app/contracts/Result";
 
 /**
