@@ -6,6 +6,10 @@
  */
 
 export { BaseHandler } from "./BaseHandler";
+export {
+  AuthenticatedHandler,
+  type AuthenticatedRequest,
+} from "./AuthenticatedHandler";
 
 // Export types for convenience
 export type { ApiError } from "../responses";
