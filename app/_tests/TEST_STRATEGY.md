@@ -22,53 +22,7 @@ describe("Service Health", () => {
 });
 ```
 
-### 2. **Contract Tests** (`*.contract.test.ts`)
-
-- **Purpose**: API contract verification with mocked dependencies
-- **Scope**: HTTP request/response structure validation
-- **When to use**: To define and verify API contracts during TDD
-- **Dependencies**: Uses `createMockDepsForContract()` for complete isolation
-- **Key Features**:
-  - Mock all dependencies including use cases
-  - Mock authentication to return successful verification
-  - Focus on HTTP status codes, response structure, and data validation
-  - Test error scenarios and edge cases
-  - Should **PASS** when properly mocked to test the contract
-
-```typescript
-// Example: Contract test verifying API structure
-describe("Collections Contract Tests", () => {
-  beforeEach(() => {
-    deps = createMockDepsForContract(); // All dependencies mocked
-    ({ app } = makeExpressApp(deps));
-  });
-
-  it("should create a new collection successfully", async () => {
-    // Mock the use case to return expected response
-    const createCollectionMock = deps.createCollection.execute as ReturnType<
-      typeof vi.fn
-    >;
-    createCollectionMock.mockResolvedValue(Result.success(mockData));
-
-    // Test API contract - should PASS with proper mocks
-    await supertest(app)
-      .post("/api/v1/collections")
-      .set("Authorization", "Bearer valid_token")
-      .send(newCollection)
-      .expect(201)
-      .expect((res) => {
-        expect(res.body.success).toBe(true);
-        expect(res.body.data).toMatchObject({
-          id: expect.any(String),
-          name: newCollection.name,
-          // ... contract verification
-        });
-      });
-  });
-});
-```
-
-### 3. **Integration Tests** (`*.integration.test.ts`)
+### 2. **Integration Tests** (`*.integration.test.ts`)
 
 - **Purpose**: Multi-component workflow testing with realistic scenarios
 - **Scope**: Business workflow validation across multiple use cases
@@ -103,7 +57,7 @@ describe("Library Collection Workflow Integration", () => {
 });
 ```
 
-### 4. **End-to-End (E2E) Tests** (`*.e2e.test.ts`)
+### 3. **End-to-End (E2E) Tests** (`*.e2e.test.ts`)
 
 - **Purpose**: Complete system testing with real implementations
 - **Scope**: Full stack testing with actual services and repositories
@@ -160,10 +114,8 @@ describe("Collections E2E Tests", () => {
 
 - **Purpose**: Centralized mock dependency creation
 - **Provides**:
-  - `createMockDepsForContract()`: Complete dependency isolation for contract tests with mocked use cases
   - `createMockDeps()`: Dependency setup with real use cases and mocked repositories
   - Individual mock creators for repositories and services
-  - Proper authentication mocking for contract tests
 
 ### `helpers/mockRepositories.ts`
 
@@ -172,26 +124,25 @@ describe("Collections E2E Tests", () => {
 
 ## Decision Matrix: Which Test Type to Use?
 
-| Scenario                               | Test Type                      | Reason                                                    |
-| -------------------------------------- | ------------------------------ | --------------------------------------------------------- |
-| Defining API endpoints during TDD      | **Contract**                   | Establish API contract before implementation              |
-| Testing HTTP request/response format   | **Contract**                   | Focus on API structure without business logic             |
-| Verifying authentication/authorization | **Contract** + **E2E**         | Contract for structure, E2E for real auth flow            |
-| Testing business workflows             | **Integration**                | Multi-step scenarios with workflow validation             |
-| Testing error handling                 | **Contract** + **Integration** | Contract for HTTP errors, Integration for business errors |
-| Pre-deployment verification            | **E2E**                        | Final validation with real implementations                |
-| Performance/load testing               | **E2E**                        | Real system behavior under load                           |
-| Testing complex data scenarios         | **Integration** + **E2E**      | Both levels depending on complexity                       |
+| Scenario                               | Test Type                 | Reason                                                |
+| -------------------------------------- | ------------------------- | ----------------------------------------------------- |
+| Defining API endpoints during TDD      | **Integration**           | Establish API behavior with business logic            |
+| Testing HTTP request/response format   | **Integration**           | Focus on API structure with actual use cases          |
+| Verifying authentication/authorization | **Integration** + **E2E** | Integration for auth flow, E2E for complete scenarios |
+| Testing business workflows             | **Integration**           | Multi-step scenarios with workflow validation         |
+| Testing error handling                 | **Integration**           | Business logic and HTTP error handling together       |
+| Pre-deployment verification            | **E2E**                   | Final validation with real implementations            |
+| Performance/load testing               | **E2E**                   | Real system behavior under load                       |
+| Testing complex data scenarios         | **Integration** + **E2E** | Both levels depending on complexity                   |
 
 ## TDD Workflow with Test Types
 
 ### 1. **Red Phase** (Write Failing Tests)
 
 ```bash
-# Start with Contract tests to define API structure - these should PASS with mocks
-1. Write contract test with proper mocks → PASS (validates API contract)
-2. Write integration test for workflow → FAIL (no use cases implemented)
-3. Write E2E test for complete scenario → FAIL (no complete implementation)
+# Start with Integration tests to define API behavior and business logic
+1. Write integration test for workflow → FAIL (no use cases implemented)
+2. Write E2E test for complete scenario → FAIL (no complete implementation)
 ```
 
 ### 2. **Green Phase** (Make Tests Pass)
@@ -208,7 +159,7 @@ describe("Collections E2E Tests", () => {
 ```bash
 # All test types should continue passing
 1. Refactor with confidence - tests catch regressions
-2. Add edge cases as contract tests
+2. Add edge cases as integration tests
 3. Add performance scenarios as E2E tests
 ```
 
@@ -290,7 +241,7 @@ describe("Protected endpoint", () => {
 pnpm test
 
 # Specific test file
-pnpm test collections.contract.test.ts
+pnpm test collections.integration.test.ts
 
 # Watch mode during development
 pnpm test --watch
@@ -305,15 +256,15 @@ pnpm test --coverage
 2. **Don't test implementation details** - Test behavior and contracts
 3. **Don't create brittle tests** - Use flexible matchers like `expect.any(String)`
 4. **Don't ignore failing tests** - Fix or update immediately
-5. **Don't mix test types** - Keep contract, integration, and E2E concerns separate
+5. **Don't mix test types** - Keep integration and E2E concerns separate
 6. **Don't share state between tests** - Ensure test isolation
 7. **Don't forget edge cases** - Test error conditions and boundary values
 
 ## Integration with Development Workflow
 
-1. **Feature Development**: Start with contract tests to define API
+1. **Feature Development**: Start with integration tests to define API behavior
 2. **Implementation**: Write use cases and handlers to pass tests
-3. **Integration**: Add integration tests for complex workflows
+3. **Integration**: Add more complex integration tests for workflows
 4. **Validation**: Run E2E tests before merging
 5. **Deployment**: All test types should pass before production release
 

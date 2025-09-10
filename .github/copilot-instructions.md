@@ -16,10 +16,9 @@
 - **All tests must pass** before committing changes
 - **Test file names**:
   - Domain/Use Case tests: `.test.ts` alongside implementation files
-  - App layer tests: `*.contract.test.ts`, `*.integration.test.ts`, `*.e2e.test.ts`
+  - App layer tests: `*.integration.test.ts`, `*.e2e.test.ts`
 - **Test type selection**:
-  - Contract tests: Define API endpoints during TDD
-  - Integration tests: Test business workflows
+  - Integration tests: Test business workflows and API behavior
   - E2E tests: Pre-deployment verification with real implementations
 
 ## Architecture Overview
@@ -74,14 +73,10 @@
 ### App Layer Test Types (See `app/_tests/TEST_STRATEGY.md` for complete guide)
 
 1. **Health Tests** (`*.test.ts`): Basic service availability without dependencies
-2. **Contract Tests** (`*.contract.test.ts`): API contract verification with mocked dependencies
-   - Define API structure during TDD red phase
-   - Use `createMockDeps()` for complete isolation
-   - Tests should FAIL until handlers are implemented
-3. **Integration Tests** (`*.integration.test.ts`): Multi-component workflow testing
+2. **Integration Tests** (`*.integration.test.ts`): Multi-component workflow testing
    - Complete business scenarios across multiple endpoints
    - Test workflow consistency and data integrity
-4. **E2E Tests** (`*.e2e.test.ts`): Full system testing with real implementations
+3. **E2E Tests** (`*.e2e.test.ts`): Full system testing with real implementations
    - Real repository and service instances
    - Complete authentication flows
    - Final pre-deployment verification
@@ -95,7 +90,7 @@
 
 ### TDD Test Workflow
 
-1. **Red Phase**: Write failing tests in order: Contract → Integration → E2E
+1. **Red Phase**: Write failing tests in order: Integration → E2E
 2. **Green Phase**: Implement to pass tests: Domain → Use Cases → Handlers → Wiring
 3. **Refactor Phase**: Improve code while all test types continue passing
 

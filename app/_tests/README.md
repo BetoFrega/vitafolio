@@ -2,16 +2,15 @@
 
 ## Test Types at a Glance
 
-| Test Type       | File Pattern            | Purpose                   | Dependencies                           | When to Use                   |
-| --------------- | ----------------------- | ------------------------- | -------------------------------------- | ----------------------------- |
-| **Health**      | `*.test.ts`             | Service availability      | None                                   | Basic health checks           |
-| **Contract**    | `*.contract.test.ts`    | API contract verification | Mocked (`createMockDepsForContract()`) | Define & verify API structure |
-| **Integration** | `*.integration.test.ts` | Business workflow testing | Mixed (mocked/real)                    | Multi-step business scenarios |
-| **E2E**         | `*.e2e.test.ts`         | Full system testing       | Real implementations                   | Pre-deployment verification   |
+| Test Type       | File Pattern            | Purpose                   | Dependencies         | When to Use                   |
+| --------------- | ----------------------- | ------------------------- | -------------------- | ----------------------------- |
+| **Health**      | `*.test.ts`             | Service availability      | None                 | Basic health checks           |
+| **Integration** | `*.integration.test.ts` | Business workflow testing | Mixed (mocked/real)  | Multi-step business scenarios |
+| **E2E**         | `*.e2e.test.ts`         | Full system testing       | Real implementations | Pre-deployment verification   |
 
 ## Quick Decision Guide
 
-**Starting a new feature?** → Begin with **Contract tests** to define your API
+**Starting a new feature?** → Begin with **Integration tests** to define API behavior and business logic
 
 **Testing user workflows?** → Use **Integration tests** for multi-step scenarios
 
@@ -21,19 +20,18 @@
 
 ## TDD Workflow
 
-1. **Red**: Write Contract test → Integration test → E2E test (Contract passes with mocks, others fail)
+1. **Red**: Write Integration test → E2E test (both fail without implementation)
 2. **Green**: Implement Domain → Use Cases → Handlers → Wiring (all tests pass)
 3. **Refactor**: Improve code while keeping all test types passing
 
 ## Helper Files
 
-- `helpers/mockDeps.ts` - Complete dependency mocking for contract tests (`createMockDepsForContract()`) and integration tests (`createMockDeps()`)
+- `helpers/mockDeps.ts` - Complete dependency mocking for integration tests (`createMockDeps()`)
 - `helpers/mockRepositories.ts` - Individual repository mocks
 
 ## Current Test Coverage
 
 ✅ **Health Tests**: `health.test.ts` - Service availability  
-✅ **Contract Tests**: Collections, Items, Notifications API contracts  
 ✅ **Integration Tests**: Library workflow, Expiration notifications, Schema evolution  
 ✅ **E2E Tests**: `collections.e2e.test.ts` - Full system with real implementations
 
