@@ -20,11 +20,11 @@ import type { SearchItems } from "@collections/app/SearchItems";
 import type { ListNotifications } from "@collections/app/ListNotifications";
 
 export type RegisterAccountDeps = {
-  registerAccount: RegisterAccount["execute"];
+  registerAccount: RegisterAccount;
 };
 
 export type LoginDeps = {
-  login: Login["execute"];
+  login: Login;
 };
 
 export type SharedDeps = {

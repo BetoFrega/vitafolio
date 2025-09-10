@@ -15,7 +15,7 @@ describe("Identity and Access Management", () => {
 
   describe("/register - User Registration", () => {
     it("should register a new user successfully", async () => {
-      deps.registerAccount = vi
+      deps.registerAccount.execute = vi
         .fn()
         .mockResolvedValue(Result.success(undefined));
 
@@ -24,14 +24,14 @@ describe("Identity and Access Management", () => {
         .send({ email: "test@example.com", password: "password" })
         .expect(201);
 
-      expect(deps.registerAccount).toHaveBeenCalledWith({
+      expect(deps.registerAccount.execute).toHaveBeenCalledWith({
         email: "test@example.com",
         password: "password",
       });
     });
 
     it("should return 400 when registration fails", async () => {
-      deps.registerAccount = vi
+      deps.registerAccount.execute = vi
         .fn()
         .mockResolvedValue(Result.failure(new Error("Registration failed")));
 
@@ -40,7 +40,7 @@ describe("Identity and Access Management", () => {
         .send({ email: "test@example.com", password: "password" })
         .expect(400);
 
-      expect(deps.registerAccount).toHaveBeenCalledWith({
+      expect(deps.registerAccount.execute).toHaveBeenCalledWith({
         email: "test@example.com",
         password: "password",
       });
@@ -53,21 +53,23 @@ describe("Identity and Access Management", () => {
         accessToken: "access-token",
         refreshToken: "refresh-token",
       };
-      deps.login = vi.fn().mockResolvedValue(Result.success(mockTokens));
+      deps.login.execute = vi
+        .fn()
+        .mockResolvedValue(Result.success(mockTokens));
 
       await supertest(app)
         .post("/login")
         .send({ email: "test@example.com", password: "password" })
         .expect(200);
 
-      expect(deps.login).toHaveBeenCalledWith({
+      expect(deps.login.execute).toHaveBeenCalledWith({
         email: "test@example.com",
         password: "password",
       });
     });
 
     it("should return 401 when login fails", async () => {
-      deps.login = vi
+      deps.login.execute = vi
         .fn()
         .mockResolvedValue(Result.failure(new Error("Authentication failed")));
 
@@ -76,7 +78,7 @@ describe("Identity and Access Management", () => {
         .send({ email: "test@example.com", password: "password" })
         .expect(401);
 
-      expect(deps.login).toHaveBeenCalledWith({
+      expect(deps.login.execute).toHaveBeenCalledWith({
         email: "test@example.com",
         password: "password",
       });

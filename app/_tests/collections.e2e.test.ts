@@ -57,8 +57,8 @@ describe("Collections E2E Tests", () => {
     // Create real use case instances
     deps = {
       // IAM
-      registerAccount: registerAccount.execute.bind(registerAccount),
-      login: login.execute.bind(login),
+      registerAccount: registerAccount,
+      login: login,
       tokenService,
 
       // Repositories

@@ -12,7 +12,7 @@ export const makeLoginHandler: RequestHandlerFactory<LoginDeps> = (
   ) => {
     const { email, password } = req.body;
     try {
-      const result = await deps.login({ email, password });
+      const result = await deps.login.execute({ email, password });
 
       if (result.isSuccess()) {
         res.status(200).json(result.getValue());
