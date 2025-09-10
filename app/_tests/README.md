@@ -2,12 +2,12 @@
 
 ## Test Types at a Glance
 
-| Test Type       | File Pattern            | Purpose                   | Dependencies                | When to Use                     |
-| --------------- | ----------------------- | ------------------------- | --------------------------- | ------------------------------- |
-| **Health**      | `*.test.ts`             | Service availability      | None                        | Basic health checks             |
-| **Contract**    | `*.contract.test.ts`    | API contract verification | Mocked (`createMockDeps()`) | Define API structure during TDD |
-| **Integration** | `*.integration.test.ts` | Business workflow testing | Mixed (mocked/real)         | Multi-step business scenarios   |
-| **E2E**         | `*.e2e.test.ts`         | Full system testing       | Real implementations        | Pre-deployment verification     |
+| Test Type       | File Pattern            | Purpose                   | Dependencies                           | When to Use                   |
+| --------------- | ----------------------- | ------------------------- | -------------------------------------- | ----------------------------- |
+| **Health**      | `*.test.ts`             | Service availability      | None                                   | Basic health checks           |
+| **Contract**    | `*.contract.test.ts`    | API contract verification | Mocked (`createMockDepsForContract()`) | Define & verify API structure |
+| **Integration** | `*.integration.test.ts` | Business workflow testing | Mixed (mocked/real)                    | Multi-step business scenarios |
+| **E2E**         | `*.e2e.test.ts`         | Full system testing       | Real implementations                   | Pre-deployment verification   |
 
 ## Quick Decision Guide
 
@@ -21,13 +21,13 @@
 
 ## TDD Workflow
 
-1. **Red**: Write Contract test → Integration test → E2E test (all fail)
-2. **Green**: Implement Domain → Use Cases → Handlers → Wiring (tests pass)
+1. **Red**: Write Contract test → Integration test → E2E test (Contract passes with mocks, others fail)
+2. **Green**: Implement Domain → Use Cases → Handlers → Wiring (all tests pass)
 3. **Refactor**: Improve code while keeping all test types passing
 
 ## Helper Files
 
-- `helpers/mockDeps.ts` - Complete dependency mocking for contract tests
+- `helpers/mockDeps.ts` - Complete dependency mocking for contract tests (`createMockDepsForContract()`) and integration tests (`createMockDeps()`)
 - `helpers/mockRepositories.ts` - Individual repository mocks
 
 ## Current Test Coverage

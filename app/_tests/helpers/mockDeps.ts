@@ -61,6 +61,120 @@ export const createMockTokenService = (): TokenService => ({
   verify: vi.fn(),
 });
 
+// Create properly typed mock use cases for contract testing
+const createMockCreateCollection = (): CreateCollection =>
+  ({
+    deps: {},
+    execute: vi.fn(),
+  }) as unknown as CreateCollection;
+
+const createMockListCollections = (): ListCollections =>
+  ({
+    deps: {},
+    execute: vi.fn(),
+  }) as unknown as ListCollections;
+
+const createMockGetCollection = (): GetCollection =>
+  ({
+    deps: {},
+    execute: vi.fn(),
+  }) as unknown as GetCollection;
+
+const createMockUpdateCollection = (): UpdateCollection =>
+  ({
+    deps: {},
+    execute: vi.fn(),
+  }) as unknown as UpdateCollection;
+
+const createMockDeleteCollection = (): DeleteCollection =>
+  ({
+    deps: {},
+    execute: vi.fn(),
+  }) as unknown as DeleteCollection;
+
+const createMockAddItemToCollection = (): AddItemToCollection =>
+  ({
+    deps: {},
+    execute: vi.fn(),
+  }) as unknown as AddItemToCollection;
+
+const createMockListItems = (): ListItems =>
+  ({
+    deps: {},
+    execute: vi.fn(),
+  }) as unknown as ListItems;
+
+const createMockGetItem = (): GetItem =>
+  ({
+    deps: {},
+    execute: vi.fn(),
+  }) as unknown as GetItem;
+
+const createMockUpdateItem = (): UpdateItem =>
+  ({
+    deps: {},
+    execute: vi.fn(),
+  }) as unknown as UpdateItem;
+
+const createMockDeleteItem = (): DeleteItem =>
+  ({
+    deps: {},
+    execute: vi.fn(),
+  }) as unknown as DeleteItem;
+
+const createMockSearchItems = (): SearchItems =>
+  ({
+    deps: {},
+    execute: vi.fn(),
+  }) as unknown as SearchItems;
+
+const createMockListNotifications = (): ListNotifications =>
+  ({
+    deps: {},
+    execute: vi.fn(),
+  }) as unknown as ListNotifications;
+
+// Create complete mock deps for contract testing (all use cases mocked)
+export const createMockDepsForContract = (): Deps => {
+  const mockTokenService = createMockTokenService();
+
+  // Mock successful token verification for contract tests
+  mockTokenService.verify = vi.fn().mockResolvedValue({
+    success: true,
+    data: { userId: "test-user-123" },
+  });
+
+  return {
+    // IAM - all mocked
+    registerAccount: vi.fn(),
+    login: vi.fn(),
+    tokenService: mockTokenService,
+
+    // Repositories - all mocked
+    collectionRepository: createMockCollectionRepository(),
+    itemRepository: createMockItemRepository(),
+    notificationRepository: createMockNotificationRepository(),
+
+    // Collection use cases - all mocked for contract tests
+    createCollection: createMockCreateCollection(),
+    listCollections: createMockListCollections(),
+    getCollection: createMockGetCollection(),
+    updateCollection: createMockUpdateCollection(),
+    deleteCollection: createMockDeleteCollection(),
+
+    // Item use cases - all mocked for contract tests
+    addItemToCollection: createMockAddItemToCollection(),
+    listItems: createMockListItems(),
+    getItem: createMockGetItem(),
+    updateItem: createMockUpdateItem(),
+    deleteItem: createMockDeleteItem(),
+    searchItems: createMockSearchItems(),
+
+    // Notification use cases - all mocked for contract tests
+    listNotifications: createMockListNotifications(),
+  };
+};
+
 // Create complete mock deps for testing
 export const createMockDeps = (): Deps => {
   const collectionRepository = createMockCollectionRepository();

@@ -14,7 +14,7 @@ describe("Collection Detail Contract Tests", () => {
     ({ app } = makeExpressApp(deps));
     (deps.tokenService.verify as Mock).mockResolvedValue({
       success: true,
-      payload: { userId: "user-1" },
+      data: { userId: "user-1" },
     });
   });
 

@@ -27,23 +27,30 @@ describe("Service Health", () => {
 - **Purpose**: API contract verification with mocked dependencies
 - **Scope**: HTTP request/response structure validation
 - **When to use**: To define and verify API contracts during TDD
-- **Dependencies**: Uses `createMockDeps()` for complete isolation
+- **Dependencies**: Uses `createMockDepsForContract()` for complete isolation
 - **Key Features**:
-  - Mock all dependencies using `vi.fn()`
+  - Mock all dependencies including use cases
+  - Mock authentication to return successful verification
   - Focus on HTTP status codes, response structure, and data validation
   - Test error scenarios and edge cases
-  - Designed to **FAIL** until actual handlers are implemented
+  - Should **PASS** when properly mocked to test the contract
 
 ```typescript
 // Example: Contract test verifying API structure
 describe("Collections Contract Tests", () => {
   beforeEach(() => {
-    deps = createMockDeps(); // All dependencies mocked
+    deps = createMockDepsForContract(); // All dependencies mocked
     ({ app } = makeExpressApp(deps));
   });
 
   it("should create a new collection successfully", async () => {
-    // Tests API contract - will FAIL until handler implemented
+    // Mock the use case to return expected response
+    const createCollectionMock = deps.createCollection.execute as ReturnType<
+      typeof vi.fn
+    >;
+    createCollectionMock.mockResolvedValue(Result.success(mockData));
+
+    // Test API contract - should PASS with proper mocks
     await supertest(app)
       .post("/api/v1/collections")
       .set("Authorization", "Bearer valid_token")
@@ -153,9 +160,10 @@ describe("Collections E2E Tests", () => {
 
 - **Purpose**: Centralized mock dependency creation
 - **Provides**:
-  - `createMockDeps()`: Complete dependency injection setup with mocks
+  - `createMockDepsForContract()`: Complete dependency isolation for contract tests with mocked use cases
+  - `createMockDeps()`: Dependency setup with real use cases and mocked repositories
   - Individual mock creators for repositories and services
-  - Real use case instances with mocked dependencies
+  - Proper authentication mocking for contract tests
 
 ### `helpers/mockRepositories.ts`
 
@@ -180,20 +188,19 @@ describe("Collections E2E Tests", () => {
 ### 1. **Red Phase** (Write Failing Tests)
 
 ```bash
-# Start with Contract tests to define API
-1. Write contract test for new endpoint → FAIL (no handler)
-2. Write integration test for workflow → FAIL (no use cases)
-3. Write E2E test for complete scenario → FAIL (no implementation)
+# Start with Contract tests to define API structure - these should PASS with mocks
+1. Write contract test with proper mocks → PASS (validates API contract)
+2. Write integration test for workflow → FAIL (no use cases implemented)
+3. Write E2E test for complete scenario → FAIL (no complete implementation)
 ```
 
 ### 2. **Green Phase** (Make Tests Pass)
 
 ```bash
 # Implement in order of dependency
-1. Implement domain entities and use cases
-2. Implement HTTP handlers to pass contract tests
-3. Wire up complete flow to pass integration tests
-4. Ensure E2E tests pass with real implementations
+1. Implement domain entities and use cases → Integration tests pass
+2. Wire up real implementations → E2E tests pass
+3. All test types should now pass with real functionality
 ```
 
 ### 3. **Refactor Phase** (Improve While Tests Pass)

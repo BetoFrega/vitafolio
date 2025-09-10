@@ -2,14 +2,14 @@ import { makeExpressApp } from "app/http/express/makeExpressApp";
 import supertest from "supertest";
 import Express from "express";
 import type { Deps } from "app/ports/Deps";
-import { createMockDeps } from "./helpers/mockDeps";
+import { createMockDepsForContract } from "./helpers/mockDeps";
 
 describe("Items API Contract Tests", () => {
   let app: Express.Application;
   let deps: Deps;
 
   beforeEach(() => {
-    deps = createMockDeps();
+    deps = createMockDepsForContract();
     ({ app } = makeExpressApp(deps));
   });
 
