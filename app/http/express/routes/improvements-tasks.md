@@ -4,10 +4,22 @@
 
 This document outlines the incremental tasks needed to implement the routes architecture improvements. All tasks follow TDD principles, introduce no breaking changes, and maintain backward compatibility throughout the migration.
 
+## 🚨 CRITICAL: E2E Test Coverage Requirement
+
+**EVERY ROUTE MUST HAVE E2E TEST COVERAGE**
+
+All tasks that involve creating or modifying routes MUST include corresponding E2E tests. This is mandatory and non-negotiable. See `/app/_tests/E2E_COVERAGE_TRACKER.md` for current coverage status.
+
+### TDD Workflow for Route Tasks:
+
+1. **E2E Tests First (RED)**: Write E2E tests before implementation
+2. **Implementation (GREEN)**: Implement to pass E2E tests
+3. **Refactor**: Improve code while keeping E2E tests green
+
 ## Task Categories
 
 - 🔧 **Infrastructure** - Foundation components
-- 🧪 **Testing** - Test infrastructure and utilities
+- 🧪 **Testing** - Test infrastructure and utilities (including E2E)
 - 🔄 **Migration** - Converting existing code
 - 🧹 **Cleanup** - Removing deprecated code
 

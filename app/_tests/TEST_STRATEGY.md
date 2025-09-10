@@ -4,6 +4,34 @@
 
 The `app/_tests` directory contains comprehensive tests for the application's HTTP layer, following a structured testing pyramid that ensures robust API behavior and system integration. All tests follow **Test-Driven Development (TDD)** principles where tests are written **before** implementation.
 
+## ⚠️ CRITICAL: E2E Test Coverage Requirement
+
+**EVERY ROUTE MUST HAVE E2E TEST COVERAGE**
+
+All API endpoints must have corresponding E2E tests that verify complete system behavior with real implementations. This is mandatory for:
+
+- ✅ **Existing routes** - All current routes must have E2E coverage
+- ✅ **New route modules** - E2E tests must be written BEFORE implementing new modules (TDD)
+- ✅ **Modified routes** - Any route changes must update corresponding E2E tests
+
+### Current E2E Coverage Status:
+
+**✅ Covered Routes:**
+
+- POST /register (in collections.e2e.test.ts)
+- POST /login (in collections.e2e.test.ts)
+- Collections routes (collections.e2e.test.ts, collections-advanced.e2e.test.ts)
+- Items routes (items.e2e.test.ts, collections.e2e.test.ts)
+
+**❌ Missing E2E Coverage (MUST BE ADDED):**
+
+- GET /health ❌ **REQUIRED**
+- GET /debug/auth ❌ **REQUIRED**
+- GET /api/v1/notifications ❌ **REQUIRED** (test exists but skipped)
+- GET /api/v1/items/search ❌ **REQUIRED**
+
+**📝 Action Required:** Before implementing any new route modules, ensure corresponding E2E tests are written first.
+
 ## Test Types & Their Purposes
 
 ### 1. **Health Tests** (`health.test.ts`)
@@ -24,35 +52,55 @@ describe("Service Health", () => {
 
 ### 2. **Integration Tests** (`*.integration.test.ts`)
 
-- **Purpose**: Multi-component workflow testing with realistic scenarios
-- **Scope**: Business workflow validation across multiple use cases
-- **When to use**: To test complex business scenarios that span multiple endpoints
-- **Dependencies**: Can use either mocked or real implementations depending on test scope
-- **Key Features**:
-  - Test complete user workflows (e.g., create collection → add items → search)
-  - Verify data consistency across operations
-  - Test business logic integration
-  - More complex setup and teardown
+**There are TWO types of integration tests with different purposes:**
+
+#### 2a. **Module Integration Tests** (`module-name.integration.test.ts`)
+
+- **Purpose**: Test a specific route module in isolation
+- **Scope**: Single module functionality without full app context
+- **Example**: `health.integration.test.ts` tests only the health module
+- **When to use**: To verify module-specific behavior and contracts
 
 ```typescript
-// Example: Integration test for complete workflow
-describe("Library Collection Workflow Integration", () => {
-  it("should complete full library management workflow", async () => {
-    // Step 1: Create a library collection
-    const createResponse = await supertest(app)
-      .post("/api/v1/collections")
-      .send(libraryCollection)
-      .expect(201);
+// Example: Module integration test
+describe("Health Routes Integration", () => {
+  beforeEach(() => {
+    app = express();
+    app.use(express.json());
 
-    // Step 2: Add multiple items
-    const collectionId = createResponse.body.data.id;
-    // ... add items
+    // Mount ONLY the health routes module
+    const healthRouter = buildHealthRoutes();
+    app.use(healthRouter);
+  });
 
-    // Step 3: Search and verify
-    // ... search functionality
+  it("should return health status with standardized response format", async () => {
+    const response = await request(app).get("/health").expect(200);
+    // Test module-specific behavior
+  });
+});
+```
 
-    // Step 4: Update and verify consistency
-    // ... update operations
+#### 2b. **App Integration Tests** (`app-*.integration.test.ts` or `main-*.integration.test.ts`)
+
+- **Purpose**: Test modules working together in full app context
+- **Scope**: Multi-module integration within complete application setup
+- **Example**: `main-routes.integration.test.ts` tests health module with full route setup
+- **When to use**: To verify modules work correctly when integrated with the complete app
+
+```typescript
+// Example: App integration test
+describe("Main Routes Integration with Health Module", () => {
+  beforeEach(() => {
+    app = express();
+    app.use(express.json());
+
+    // Mount FULL app routes including all modules
+    const mainRouter = buildRoutes(mockDeps);
+    app.use(mainRouter);
+  });
+
+  it("should respond to GET /health with new standardized format", async () => {
+    // Test that health module works in full app context
   });
 });
 ```
@@ -224,6 +272,67 @@ describe("Protected endpoint", () => {
   });
 });
 ```
+
+## TDD Workflow for New Route Modules
+
+When implementing new route modules (like auth, collections, etc.), follow this **MANDATORY** TDD sequence:
+
+### Phase 1: E2E Tests First (RED)
+
+```bash
+# 1. Create E2E test for new route module
+app/_tests/e2e/new-module.e2e.test.ts
+
+# 2. Write comprehensive E2E tests for ALL endpoints in the module
+# 3. Run tests - they should FAIL (RED phase)
+pnpm test app/_tests/e2e/new-module.e2e.test.ts
+```
+
+### Phase 2: Implementation (GREEN)
+
+```bash
+# 4. Implement route module following architecture patterns
+app/http/express/routes/new-module/
+
+# 5. Write unit tests for handlers
+# 6. Write module integration tests
+# 7. Write app integration tests
+# 8. Implement handlers and router
+# 9. All tests should PASS (GREEN phase)
+```
+
+### Phase 3: Refactor
+
+```bash
+# 10. Improve code while keeping all tests green
+# 11. Ensure E2E tests still pass after refactoring
+```
+
+## E2E Test Coverage Tracking
+
+Track E2E coverage for all routes in this section:
+
+### ✅ Routes with E2E Coverage
+
+- `POST /register` → `collections.e2e.test.ts`
+- `POST /login` → `collections.e2e.test.ts`
+- `POST /api/v1/collections` → `collections.e2e.test.ts`
+- `GET /api/v1/collections` → `collections.e2e.test.ts`
+- `GET /api/v1/collections/:id` → `collections.e2e.test.ts`
+- `PUT /api/v1/collections/:id` → `collections-advanced.e2e.test.ts`
+- `DELETE /api/v1/collections/:id` → `collections-advanced.e2e.test.ts`
+- `POST /api/v1/collections/:id/items` → `collections.e2e.test.ts`
+- `GET /api/v1/collections/:id/items` → `collections.e2e.test.ts`
+- `GET /api/v1/items/:id` → `items.e2e.test.ts`
+- `PUT /api/v1/items/:id` → `collections-advanced.e2e.test.ts`
+- `DELETE /api/v1/items/:id` → `collections-advanced.e2e.test.ts`
+
+### ❌ Routes Missing E2E Coverage (ACTION REQUIRED)
+
+- `GET /health` → **MUST CREATE: `health.e2e.test.ts`**
+- `GET /debug/auth` → **MUST CREATE: `auth.e2e.test.ts` or add to existing**
+- `GET /api/v1/notifications` → **MUST ENABLE: `notifications.e2e.test.ts` (currently skipped)**
+- `GET /api/v1/items/search` → **MUST CREATE: `search.e2e.test.ts` or add to items**
 
 ## Running Tests
 

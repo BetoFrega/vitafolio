@@ -186,19 +186,113 @@ class CreateItemHandler extends AuthenticatedHandler<ItemData> {
 }
 ```
 
+### ✅ Task 2.1 - Health Routes Module (Pilot) (COMPLETED)
+
+**Key Achievement**: First successful implementation of new modular route architecture
+
+**What we built**:
+
+```typescript
+// HealthHandler using new BaseHandler pattern
+export class HealthHandler extends BaseHandler<HealthData> {
+  async handle(req: Request, res: Response): Promise<void> {
+    const healthData: HealthData = { ok: true };
+    this.sendSuccess(res, healthData, 200);
+  }
+}
+
+// buildHealthRoutes module function
+export function buildHealthRoutes(): express.Router {
+  const router = express.Router();
+  const healthHandler = new HealthHandler();
+  router.get("/health", async (req, res) => {
+    await healthHandler.handle(req, res);
+  });
+  return router;
+}
+```
+
+**Key Implementation Steps (TDD)**:
+
+1. ✅ **RED**: Wrote failing tests for HealthHandler class (4 tests)
+2. ✅ **GREEN**: Implemented HealthHandler extending BaseHandler
+3. ✅ **RED**: Wrote failing tests for health module router (4 tests)
+4. ✅ **GREEN**: Implemented buildHealthRoutes function
+5. ✅ **RED**: Wrote failing integration tests with Express app (3 tests)
+6. ✅ **GREEN**: Created supertest integration tests (3 tests)
+7. ✅ **RED**: Wrote failing main routes integration tests (3 tests)
+8. ✅ **GREEN**: Updated main routes/index.ts to use new health module
+9. ✅ **REFACTOR**: All 14 health tests passing, full test suite green (131 tests)
+
+**Key Features**:
+
+- ✅ **Standardized response format**: `{ success: true, data: { ok: true }, timestamp: "..." }`
+- ✅ **Modular architecture**: Health routes in `/app/http/express/routes/health/`
+- ✅ **Class-based handler**: HealthHandler extends BaseHandler pattern
+- ✅ **TDD implementation**: All code written after failing tests
+- ✅ **Zero regression**: All existing tests still pass
+- ✅ **Integration verified**: Works with main Express app routing
+
+**Breaking Change Implemented**:
+
+- **OLD FORMAT**: `{ ok: true }`
+- **NEW FORMAT**: `{ success: true, data: { ok: true }, timestamp: "2025-..." }`
+- **Backward compatibility**: Health data still contains `{ ok: true }` in `data` field
+
+**File Structure Created**:
+
+```text
+app/http/express/routes/health/
+├── HealthHandler.ts              # Handler class
+├── HealthHandler.test.ts         # Unit tests (4 tests)
+├── index.ts                      # Module router
+├── index.test.ts                 # Router tests (4 tests)
+├── health.integration.test.ts    # Integration tests (3 tests)
+└── main-routes.integration.test.ts # Main app integration (3 tests)
+```
+
 ---
 
-## 🔄 CURRENT TASK: Phase 2, Task 2.1 - Health Routes Module (Pilot)
+## 🔄 CURRENT TASK: Phase 2, Task 2.2 - Auth Routes Module
 
-**Objective**: Migrate health check to new architecture as pilot implementation
+**Objective**: Migrate authentication routes (login, register) to new modular architecture
+
+**🚨 CRITICAL: E2E Test Requirements**
+
+- **ALL routes must have E2E test coverage** - this is mandatory
+- **E2E tests must be written BEFORE implementation** (TDD requirement)
+- Current missing E2E coverage that MUST be added:
+  - ✅ GET /health → **COMPLETED** (`health.e2e.test.ts` with 6 tests)
+  - ❌ GET /debug/auth → **REQUIRED for auth module**
+  - ❌ GET /api/v1/notifications → **Currently skipped, must enable**
+  - ❌ GET /api/v1/items/search → **Missing search E2E tests**
 
 **TDD Implementation Plan**:
 
-1. ⏳ Analyze existing health check endpoint structure
-2. ⏳ Write tests for health route handler class
-3. ⏳ Test health module router setup
-4. ⏳ Implement health handler and router following new patterns
-5. ⏳ Integration test with Express app
+1. ⏳ **E2E Tests First (RED Phase)**:
+   - Create `auth.e2e.test.ts` with tests for login, register, debug/auth endpoints
+   - ✅ Create `health.e2e.test.ts` for health endpoint (**COMPLETED** - 6 passing tests)
+   - Run tests - should FAIL (RED phase)
+
+2. ⏳ **Analysis & Design**:
+   - Analyze existing auth handlers (makeLoginHandler, makeUserRegistrationHandler)
+   - Write unit tests for auth handler classes
+
+3. ⏳ **Implementation (GREEN Phase)**:
+   - Test auth module router setup
+   - Implement auth handlers and router following new patterns
+   - Integration test with Express app
+   - All tests should PASS (GREEN phase)
+
+4. ⏳ **Refactor Phase**:
+   - Improve code while keeping all tests green
+
+**🎯 Success Criteria**:
+
+- All auth routes have E2E test coverage
+- Health endpoint has E2E test coverage
+- No regression in existing functionality
+- Follow new architecture patterns established in health module
 
 ---
 
@@ -232,9 +326,18 @@ class CreateItemHandler extends AuthenticatedHandler<ItemData> {
 
 ### Important Reminders:
 
-- **Health endpoint special case**: Returns `{ ok: true }` - decide whether to standardize later
+- **E2E test coverage is MANDATORY for ALL routes** - documented in `/app/_tests/TEST_STRATEGY.md`
+- **TDD approach with E2E tests first** - write E2E tests BEFORE implementing new modules
+- **Health endpoint special case**: Returns `{ ok: true }` in data field with standardized wrapper
 - **Authentication middleware**: Located at `/app/http/express/middleware/makeAuthenticationMiddleware.ts`
 - **Result pattern**: Use `result.isSuccess()`, `result.getValue()`, etc. (NOT just static methods)
+- **Current E2E coverage gaps**: health, debug/auth, notifications (skipped), search routes
+
+### E2E Test Coverage Status:
+
+- ✅ **Covered**: register, login, collections, items CRUD, **health**
+- ❌ **Missing**: debug/auth, notifications, search
+- 📝 **Action Required**: Create missing E2E tests before proceeding with new modules
 
 ### Architecture Constraints:
 
