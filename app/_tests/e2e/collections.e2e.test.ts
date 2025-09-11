@@ -1,10 +1,9 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import request from "supertest";
 import { setupE2ETest, type E2ETestContext } from "../helpers/e2e-setup";
-import { TestDataBuilder } from "../helpers/test-data-builders";
 import type { Application } from "express";
 
-describe("Collections V2 API E2E Tests", () => {
+describe("Collections E2E Tests", () => {
   let app: Application;
   let context: E2ETestContext;
   let authToken: string;
@@ -12,33 +11,17 @@ describe("Collections V2 API E2E Tests", () => {
   beforeEach(async () => {
     context = await setupE2ETest();
     app = context.app;
-
-    // Register and login to get auth token
-    const userData = TestDataBuilder.user();
-    await request(app)
-      .post("/register")
-      .send(userData)
-      .expect(201);
-
-    const loginResponse = await request(app)
-      .post("/login")
-      .send({
-        email: userData.email,
-        password: userData.password,
-      })
-      .expect(200);
-
-    authToken = loginResponse.body.data.token;
+    authToken = context.accessToken;
   });
 
-  describe("POST /api/v2/collections", () => {
+  describe("POST /api/v1/collections", () => {
     it("should create a collection successfully", async () => {
       const response = await request(app)
-        .post("/api/v2/collections")
+        .post("/api/v1/collections")
         .set("Authorization", `Bearer ${authToken}`)
         .send({
-          name: "Test Collection V2",
-          description: "A test collection using the new V2 API",
+          name: "Test Collection V1",
+          description: "A test collection using the V1 API",
           metadataSchema: {
             fields: {
               title: {
@@ -60,8 +43,8 @@ describe("Collections V2 API E2E Tests", () => {
         success: true,
         data: {
           id: expect.any(String),
-          name: "Test Collection V2",
-          description: "A test collection using the new V2 API",
+          name: "Test Collection V1",
+          description: "A test collection using the V1 API",
           createdAt: expect.any(String),
           updatedAt: expect.any(String),
         },
@@ -74,7 +57,7 @@ describe("Collections V2 API E2E Tests", () => {
 
     it("should return 401 when not authenticated", async () => {
       const response = await request(app)
-        .post("/api/v2/collections")
+        .post("/api/v1/collections")
         .send({
           name: "Test Collection",
           description: "A test collection",
@@ -94,7 +77,7 @@ describe("Collections V2 API E2E Tests", () => {
 
     it("should return 400 when validation fails", async () => {
       const response = await request(app)
-        .post("/api/v2/collections")
+        .post("/api/v1/collections")
         .set("Authorization", `Bearer ${authToken}`)
         .send({
           // Missing required fields
@@ -113,11 +96,11 @@ describe("Collections V2 API E2E Tests", () => {
     });
   });
 
-  describe("GET /api/v2/collections/:id", () => {
+  describe("GET /api/v1/collections/:id", () => {
     it("should get a collection successfully", async () => {
       // First create a collection
       const createResponse = await request(app)
-        .post("/api/v2/collections")
+        .post("/api/v1/collections")
         .set("Authorization", `Bearer ${authToken}`)
         .send({
           name: "Test Collection for Get",
@@ -138,7 +121,7 @@ describe("Collections V2 API E2E Tests", () => {
 
       // Then get the collection
       const getResponse = await request(app)
-        .get(`/api/v2/collections/${collectionId}`)
+        .get(`/api/v1/collections/${collectionId}`)
         .set("Authorization", `Bearer ${authToken}`)
         .expect(200);
 
@@ -169,7 +152,7 @@ describe("Collections V2 API E2E Tests", () => {
 
     it("should return 404 when collection not found", async () => {
       const response = await request(app)
-        .get("/api/v2/collections/550e8400-e29b-41d4-a716-446655440000")
+        .get("/api/v1/collections/550e8400-e29b-41d4-a716-446655440000")
         .set("Authorization", `Bearer ${authToken}`)
         .expect(404);
 
@@ -185,7 +168,7 @@ describe("Collections V2 API E2E Tests", () => {
 
     it("should return 400 when collection id is invalid", async () => {
       const response = await request(app)
-        .get("/api/v2/collections/invalid-uuid")
+        .get("/api/v1/collections/invalid-uuid")
         .set("Authorization", `Bearer ${authToken}`)
         .expect(400);
 
@@ -201,7 +184,7 @@ describe("Collections V2 API E2E Tests", () => {
 
     it("should return 401 when not authenticated", async () => {
       const response = await request(app)
-        .get("/api/v2/collections/550e8400-e29b-41d4-a716-446655440000")
+        .get("/api/v1/collections/550e8400-e29b-41d4-a716-446655440000")
         .expect(401);
 
       expect(response.body).toMatchObject({

@@ -102,9 +102,7 @@ export const buildRoutes = (
     );
   } else {
     // Fallback for tests without auth middleware
-    router.post("/api/v1/collections", makeCreateCollectionHandler(deps));
     router.get("/api/v1/collections", makeListCollectionsHandler(deps));
-    router.get("/api/v1/collections/:id", makeGetCollectionHandler(deps));
     router.put("/api/v1/collections/:id", makeUpdateCollectionHandler(deps));
     router.delete("/api/v1/collections/:id", makeDeleteCollectionHandler(deps));
 
