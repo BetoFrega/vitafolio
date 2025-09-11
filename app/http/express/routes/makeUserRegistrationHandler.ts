@@ -12,7 +12,7 @@ export const makeUserRegistrationHandler: RequestHandlerFactory<
   ) => {
     const { email, password } = req.body;
     try {
-      const result = await deps.registerAccount({ email, password });
+      const result = await deps.registerAccount.execute({ email, password });
 
       if (result.isSuccess()) {
         res.status(201).json({ message: "Account registered successfully" });

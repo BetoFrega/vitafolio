@@ -19,7 +19,8 @@
     "baseUrl": ".",
     "paths": {
       "@shared/*": ["./lib/shared/*"],
-      "@iam/*": ["./lib/iam/*"]
+      "@iam/*": ["./lib/iam/*"],
+      "@collections/*": ["./lib/collections/*"]
     },
     "types": ["node", "vitest/globals"]
   },

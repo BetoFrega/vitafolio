@@ -1,13 +1,120 @@
 import type { Deps } from "../../../ports/Deps";
 import express from "express";
-import { makeUserRegistrationHandler } from "./makeUserRegistrationHandler";
-import { makeHealthCheckHandler } from "./makeHealthCheckHandler";
-import { makeLoginHandler } from "./makeLoginHandler";
+import { buildHealthRoutes } from "./health";
+import { buildAuthRoutes } from "./auth";
+import { buildCollectionsRouter } from "./collections";
 
-export const buildRoutes = (deps: Deps) => {
+// Collections route handlers
+import { makeListCollectionsHandler } from "./makeListCollectionsHandler";
+import { makeUpdateCollectionHandler } from "./makeUpdateCollectionHandler";
+import { makeDeleteCollectionHandler } from "./makeDeleteCollectionHandler";
+import { makeCreateItemHandler } from "./makeCreateItemHandler";
+import { makeListItemsHandler } from "./makeListItemsHandler";
+import { makeGetItemHandler } from "./makeGetItemHandler";
+import { makeUpdateItemHandler } from "./makeUpdateItemHandler";
+import { makeDeleteItemHandler } from "./makeDeleteItemHandler";
+import { makeSearchItemsHandler } from "./makeSearchItemsHandler";
+import { makeListNotificationsHandler } from "./makeListNotificationsHandler";
+
+export const buildRoutes = (
+  deps: Deps,
+  authMiddleware?: express.RequestHandler,
+) => {
   const router = express.Router();
-  router.get("/health", makeHealthCheckHandler(deps));
-  router.post("/register", makeUserRegistrationHandler(deps));
-  router.post("/login", makeLoginHandler(deps));
+  console.log("Building routes with authMiddleware:", !!authMiddleware);
+
+  // Health routes (new modular approach)
+  const healthRouter = buildHealthRoutes();
+  router.use(healthRouter);
+
+  // Authentication routes (new modular approach)
+  const authRouter = buildAuthRoutes(deps, authMiddleware);
+  router.use(authRouter);
+
+  // Collections routes (new modular approach) - V2 API for demonstration
+  if (authMiddleware) {
+    const collectionsRouter = buildCollectionsRouter({
+      createCollection: deps.createCollection,
+      getCollection: deps.getCollection,
+    });
+    router.use("/api/v1/collections", authMiddleware, collectionsRouter);
+  }
+
+  // Collections routes (protected)
+  if (authMiddleware) {
+    router.post(
+      "/api/v1/collections",
+      authMiddleware,
+    );
+    router.get(
+      "/api/v1/collections",
+      authMiddleware,
+      makeListCollectionsHandler(deps),
+    );
+    router.get(
+      "/api/v1/collections/:id",
+      authMiddleware,
+    );
+    router.put(
+      "/api/v1/collections/:id",
+      authMiddleware,
+      makeUpdateCollectionHandler(deps),
+    );
+    router.delete(
+      "/api/v1/collections/:id",
+      authMiddleware,
+      makeDeleteCollectionHandler(deps),
+    );
+
+    // Items routes (protected)
+    router.post(
+      "/api/v1/collections/:collectionId/items",
+      authMiddleware,
+      makeCreateItemHandler(deps),
+    );
+    router.get(
+      "/api/v1/collections/:collectionId/items",
+      authMiddleware,
+      makeListItemsHandler(deps),
+    );
+    router.get("/api/v1/items/:id", authMiddleware, makeGetItemHandler(deps));
+    router.put(
+      "/api/v1/items/:id",
+      authMiddleware,
+      makeUpdateItemHandler(deps),
+    );
+    router.delete(
+      "/api/v1/items/:id",
+      authMiddleware,
+      makeDeleteItemHandler(deps),
+    );
+    router.get(
+      "/api/v1/items/search",
+      authMiddleware,
+      makeSearchItemsHandler(deps),
+    );
+
+    // Notifications routes (protected)
+    router.get(
+      "/api/v1/notifications",
+      authMiddleware,
+      makeListNotificationsHandler(deps),
+    );
+  } else {
+    // Fallback for tests without auth middleware
+    router.get("/api/v1/collections", makeListCollectionsHandler(deps));
+    router.put("/api/v1/collections/:id", makeUpdateCollectionHandler(deps));
+    router.delete("/api/v1/collections/:id", makeDeleteCollectionHandler(deps));
+
+    router.post("/api/v1/collections/:id/items", makeCreateItemHandler(deps));
+    router.get("/api/v1/collections/:id/items", makeListItemsHandler(deps));
+    router.get("/api/v1/items/:id", makeGetItemHandler(deps));
+    router.put("/api/v1/items/:id", makeUpdateItemHandler(deps));
+    router.delete("/api/v1/items/:id", makeDeleteItemHandler(deps));
+    router.get("/api/v1/items/search", makeSearchItemsHandler(deps));
+
+    router.get("/api/v1/notifications", makeListNotificationsHandler(deps));
+  }
+
   return router;
 };

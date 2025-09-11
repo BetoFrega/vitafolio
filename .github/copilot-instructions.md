@@ -14,7 +14,12 @@
 - **Tests must be written BEFORE implementation**
 - **Run tests frequently** (use testing tools) to ensure nothing breaks
 - **All tests must pass** before committing changes
-- **Test file names**: Always create `.test.ts` files alongside implementation files
+- **Test file names**:
+  - Domain/Use Case tests: `.test.ts` alongside implementation files
+  - App layer tests: `*.integration.test.ts`, `*.e2e.test.ts`
+- **Test type selection**:
+  - Integration tests: Test business workflows and API behavior
+  - E2E tests: Pre-deployment verification with real implementations
 
 ## Architecture Overview
 
@@ -65,11 +70,29 @@
 - **Test behavior, not implementation** - focus on inputs/outputs
 - **Arrange-Act-Assert** pattern for test structure
 
+### App Layer Test Types (See `app/_tests/TEST_STRATEGY.md` for complete guide)
+
+1. **Health Tests** (`*.test.ts`): Basic service availability without dependencies
+2. **Integration Tests** (`*.integration.test.ts`): Multi-component workflow testing
+   - Complete business scenarios across multiple endpoints
+   - Test workflow consistency and data integrity
+3. **E2E Tests** (`*.e2e.test.ts`): Full system testing with real implementations
+   - Real repository and service instances
+   - Complete authentication flows
+   - Final pre-deployment verification
+
 ### Test Organization
 
-- **Domain tests**: Focus on entity creation, validation, and behavior
+- **Domain tests**: Entity creation, validation, and behavior (`.test.ts` alongside implementation)
 - **Use case tests**: Mock dependencies and test complete workflows
-- **Integration tests**: Test combinations of components working together
+- **App layer tests**: Four-tier strategy (health → contract → integration → e2e)
+- **Test helpers**: Centralized mock creation in `helpers/` directory
+
+### TDD Test Workflow
+
+1. **Red Phase**: Write failing tests in order: Integration → E2E
+2. **Green Phase**: Implement to pass tests: Domain → Use Cases → Handlers → Wiring
+3. **Refactor Phase**: Improve code while all test types continue passing
 
 ## Development Workflow
 
