@@ -236,8 +236,9 @@ describe("Items E2E Tests (New Class-Based Handlers)", () => {
     });
 
     it("should return 404 when item not found", async () => {
+      const nonexistentId = "123e4567-e89b-12d3-a456-426614174000";
       const response = await request(app)
-        .put("/api/v1/items/nonexistent")
+        .put(`/api/v1/items/${nonexistentId}`)
         .set("Authorization", `Bearer ${authToken}`)
         .send({
           name: "Won't work",
@@ -274,8 +275,9 @@ describe("Items E2E Tests (New Class-Based Handlers)", () => {
     });
 
     it("should return 404 when item not found", async () => {
+      const nonexistentId = "123e4567-e89b-12d3-a456-426614174000";
       const response = await request(app)
-        .delete("/api/v1/items/nonexistent")
+        .delete(`/api/v1/items/${nonexistentId}`)
         .set("Authorization", `Bearer ${authToken}`);
 
       expect(response.status).toBe(404);
@@ -342,12 +344,16 @@ describe("Items E2E Tests (New Class-Based Handlers)", () => {
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
       expect(response.body.data.items).toHaveLength(2);
+      // check offset by ensuring the first item is not the first created
+      expect(response.body.data.items[0].name).not.toBe("Searchable Item 1");
     });
 
     it("should search with metadata filter", async () => {
       const metadataFilter = JSON.stringify({ category: "important" });
       const response = await request(app)
-        .get(`/api/v1/items/search?metadata=${encodeURIComponent(metadataFilter)}`)
+        .get(
+          `/api/v1/items/search?metadata=${encodeURIComponent(metadataFilter)}`,
+        )
         .set("Authorization", `Bearer ${authToken}`);
 
       expect(response.status).toBe(200);
