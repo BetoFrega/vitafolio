@@ -13,7 +13,10 @@ import type { UpdateItem } from "@collections/app/UpdateItem";
 const UpdateItemSchema = z.object({
   name: z.string().min(1, "Item name cannot be empty").optional(),
   metadata: z
-    .record(z.string(), z.union([z.string(), z.number(), z.date(), z.boolean()]))
+    .record(
+      z.string(),
+      z.union([z.string(), z.number(), z.date(), z.boolean()]),
+    )
     .optional(),
 });
 
@@ -25,7 +28,6 @@ interface UpdateItemResponseData {
   name: string;
   collectionId: string;
   metadata: Record<string, string | number | Date | boolean>;
-  createdAt: string;
   updatedAt: string;
 }
 
@@ -104,7 +106,6 @@ export class UpdateItemHandler extends AuthenticatedHandler<UpdateItemResponseDa
           name: itemData.name,
           collectionId: itemData.collectionId,
           metadata: itemData.metadata,
-          createdAt: itemData.createdAt.toISOString(),
           updatedAt: itemData.updatedAt.toISOString(),
         };
         return this.sendSuccess(res, responseData, 200);

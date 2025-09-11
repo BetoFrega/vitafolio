@@ -176,8 +176,10 @@ describe("Items E2E Tests (New Class-Based Handlers)", () => {
     });
 
     it("should return 404 when item not found", async () => {
+      // valid uuid but nonexistent
+      const nonexistentId = "123e4567-e89b-12d3-a456-426614174000";
       const response = await request(app)
-        .get("/api/v1/items/nonexistent")
+        .get(`/api/v1/items/${nonexistentId}`)
         .set("Authorization", `Bearer ${authToken}`);
 
       expect(response.status).toBe(404);
