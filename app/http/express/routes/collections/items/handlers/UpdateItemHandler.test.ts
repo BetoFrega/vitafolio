@@ -76,7 +76,6 @@ describe("UpdateItemHandler", () => {
           name: "Updated Item",
           collectionId: "collection123",
           metadata: { type: "updated", value: 100 },
-          createdAt: "2024-01-01T00:00:00.000Z",
           updatedAt: "2024-01-01T01:00:00.000Z",
         },
         timestamp: expect.any(String),
