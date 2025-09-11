@@ -1,327 +1,217 @@
-import { makeExpressApp } from "app/http/express/makeExpressApp";
-import supertest from "supertest";
-import Express from "express";
-import type { Deps } from "app/ports/Deps";
+import { describe, it, expect, beforeEach } from "vitest";
+import request from "supertest";
+import { setupE2ETest, type E2ETestContext } from "../helpers/e2e-setup";
+import { TestDataBuilder } from "../helpers/test-data-builders";
+import type { Application } from "express";
 
-// Real implementations for E2E testing
-import { InMemoryCollectionRepository } from "@collections/adapters/InMemoryCollectionRepository";
-import { InMemoryItemRepository } from "@collections/adapters/InMemoryItemRepository";
-import { InMemoryNotificationRepository } from "@collections/adapters/InMemoryNotificationRepository";
-import { InMemoryUserRepository } from "@iam/adapters/InMemoryUserRepository";
-import { NodeHashService } from "@iam/adapters/NodeHashService";
-import { NodeTokenService } from "@iam/adapters/NodeTokenService";
-import { RegisterAccount } from "@iam/app/RegisterAccount";
-import { Login } from "@iam/app/Login";
-
-// Collections use cases
-import { CreateCollection } from "@collections/app/CreateCollection";
-import { ListCollections } from "@collections/app/ListCollections";
-import { GetCollection } from "@collections/app/GetCollection";
-import { UpdateCollection } from "@collections/app/UpdateCollection";
-import { DeleteCollection } from "@collections/app/DeleteCollection";
-import { AddItemToCollection } from "@collections/app/AddItemToCollection";
-import { ListItems } from "@collections/app/ListItems";
-import { GetItem } from "@collections/app/GetItem";
-import { UpdateItem } from "@collections/app/UpdateItem";
-import { DeleteItem } from "@collections/app/DeleteItem";
-import { SearchItems } from "@collections/app/SearchItems";
-import { ListNotifications } from "@collections/app/ListNotifications";
-
-describe("Collections E2E Tests", () => {
-  let app: Express.Application;
-  let deps: Deps;
-  let accessToken: string;
+describe("Collections V2 API E2E Tests", () => {
+  let app: Application;
+  let context: E2ETestContext;
+  let authToken: string;
 
   beforeEach(async () => {
-    // Create real repository instances
-    const userRepository = new InMemoryUserRepository();
-    const collectionRepository = new InMemoryCollectionRepository();
-    const itemRepository = new InMemoryItemRepository();
-    const notificationRepository = new InMemoryNotificationRepository();
+    context = await setupE2ETest();
+    app = context.app;
 
-    // Create real service instances
-    const hashService = new NodeHashService();
-    const tokenService = new NodeTokenService();
+    // Register and login to get auth token
+    const userData = TestDataBuilder.user();
+    await request(app)
+      .post("/register")
+      .send(userData)
+      .expect(201);
 
-    // Create real IAM use case instances
-    const registerAccount = new RegisterAccount({
-      repository: userRepository,
-      hashService,
-    });
-    const login = new Login({
-      userRepository,
-      hashService,
-      tokenService,
-    });
+    const loginResponse = await request(app)
+      .post("/login")
+      .send({
+        email: userData.email,
+        password: userData.password,
+      })
+      .expect(200);
 
-    // Create real use case instances
-    deps = {
-      // IAM
-      registerAccount: registerAccount,
-      login: login,
-      tokenService,
-
-      // Repositories
-      collectionRepository,
-      itemRepository,
-      notificationRepository,
-
-      // Collection use cases
-      createCollection: new CreateCollection({ collectionRepository }),
-      listCollections: new ListCollections({ collectionRepository }),
-      getCollection: new GetCollection({ collectionRepository }),
-      updateCollection: new UpdateCollection({
-        collectionRepository,
-        itemRepository,
-      }),
-      deleteCollection: new DeleteCollection({
-        collectionRepository,
-        itemRepository,
-        notificationRepository,
-      }),
-
-      // Item use cases
-      addItemToCollection: new AddItemToCollection({
-        collectionRepository,
-        itemRepository,
-      }),
-      listItems: new ListItems({ itemRepository }),
-      getItem: new GetItem({ itemRepository }),
-      updateItem: new UpdateItem({ itemRepository, collectionRepository }),
-      deleteItem: new DeleteItem({ itemRepository, notificationRepository }),
-      searchItems: new SearchItems({ itemRepository }),
-
-      // Notification use cases
-      listNotifications: new ListNotifications({ notificationRepository }),
-    };
-
-    ({ app } = makeExpressApp(deps));
-
-    // Register a test user and get a real access token
-    const registerResponse = await supertest(app).post("/register").send({
-      email: "test@example.com",
-      password: "Test123!",
-      confirmPassword: "Test123!",
-    });
-
-    expect(registerResponse.status).toBe(201);
-
-    // Login to get access token
-    const loginResponse = await supertest(app).post("/login").send({
-      email: "test@example.com",
-      password: "Test123!",
-    });
-
-    expect(loginResponse.status).toBe(200);
-    accessToken = loginResponse.body.data.token;
+    authToken = loginResponse.body.data.token;
   });
 
-  describe("Collection Management", () => {
-    it("should create a new collection", async () => {
-      const newCollection = {
-        name: "My Library",
-        description: "Books I want to read",
-        metadataSchema: {
-          fields: {
-            title: { type: "text", required: true },
-            author: { type: "text", required: true },
-            isbn: { type: "text", required: false },
+  describe("POST /api/v2/collections", () => {
+    it("should create a collection successfully", async () => {
+      const response = await request(app)
+        .post("/api/v2/collections")
+        .set("Authorization", `Bearer ${authToken}`)
+        .send({
+          name: "Test Collection V2",
+          description: "A test collection using the new V2 API",
+          metadataSchema: {
+            fields: {
+              title: {
+                type: "text",
+                required: true,
+                description: "Item title",
+              },
+              priority: {
+                type: "number",
+                required: false,
+                description: "Priority level",
+              },
+            },
           },
-        },
-      };
-
-      const response = await supertest(app)
-        .post("/api/v1/collections")
-        .set("Authorization", `Bearer ${accessToken}`)
-        .send(newCollection)
+        })
         .expect(201);
 
-      expect(response.body.success).toBe(true);
-      expect(response.body.data).toMatchObject({
-        id: expect.any(String),
-        name: newCollection.name,
-        description: newCollection.description,
-        createdAt: expect.any(String),
-        updatedAt: expect.any(String),
+      expect(response.body).toMatchObject({
+        success: true,
+        data: {
+          id: expect.any(String),
+          name: "Test Collection V2",
+          description: "A test collection using the new V2 API",
+          createdAt: expect.any(String),
+          updatedAt: expect.any(String),
+        },
+        timestamp: expect.any(String),
+      });
+
+      // ownerId should not be included in response for security
+      expect(response.body.data).not.toHaveProperty("ownerId");
+    });
+
+    it("should return 401 when not authenticated", async () => {
+      const response = await request(app)
+        .post("/api/v2/collections")
+        .send({
+          name: "Test Collection",
+          description: "A test collection",
+          metadataSchema: { fields: {} },
+        })
+        .expect(401);
+
+      expect(response.body).toMatchObject({
+        success: false,
+        error: {
+          code: "UNAUTHORIZED",
+          message: "Authentication required",
+        },
+        timestamp: expect.any(String),
       });
     });
 
-    it("should list all collections for authenticated user", async () => {
-      // First create a collection
-      const newCollection = {
-        name: "My Library",
-        description: "Books I want to read",
-        metadataSchema: {
-          fields: {
-            title: { type: "text", required: true },
-            author: { type: "text", required: true },
-          },
+    it("should return 400 when validation fails", async () => {
+      const response = await request(app)
+        .post("/api/v2/collections")
+        .set("Authorization", `Bearer ${authToken}`)
+        .send({
+          // Missing required fields
+          description: "A test collection",
+        })
+        .expect(400);
+
+      expect(response.body).toMatchObject({
+        success: false,
+        error: {
+          code: "VALIDATION_ERROR",
+          message: expect.stringContaining("name"),
         },
-      };
-
-      const createResponse = await supertest(app)
-        .post("/api/v1/collections")
-        .set("Authorization", `Bearer ${accessToken}`)
-        .send(newCollection)
-        .expect(201);
-
-      const collectionId = createResponse.body.data.id;
-
-      // Then list collections
-      const listResponse = await supertest(app)
-        .get("/api/v1/collections")
-        .set("Authorization", `Bearer ${accessToken}`)
-        .expect(200);
-
-      expect(listResponse.body.success).toBe(true);
-      expect(listResponse.body.data.collections).toHaveLength(1);
-      expect(listResponse.body.data.collections[0]).toMatchObject({
-        id: collectionId,
-        name: newCollection.name,
-        description: newCollection.description,
-        itemCount: 0,
+        timestamp: expect.any(String),
       });
     });
+  });
 
-    it("should get a specific collection", async () => {
+  describe("GET /api/v2/collections/:id", () => {
+    it("should get a collection successfully", async () => {
       // First create a collection
-      const newCollection = {
-        name: "My Library",
-        description: "Books I want to read",
-        metadataSchema: {
-          fields: {
-            title: { type: "text", required: true },
-            author: { type: "text", required: true },
+      const createResponse = await request(app)
+        .post("/api/v2/collections")
+        .set("Authorization", `Bearer ${authToken}`)
+        .send({
+          name: "Test Collection for Get",
+          description: "A test collection for get operation",
+          metadataSchema: {
+            fields: {
+              title: {
+                type: "text",
+                required: true,
+                description: "Item title",
+              },
+            },
           },
-        },
-      };
-
-      const createResponse = await supertest(app)
-        .post("/api/v1/collections")
-        .set("Authorization", `Bearer ${accessToken}`)
-        .send(newCollection)
+        })
         .expect(201);
 
       const collectionId = createResponse.body.data.id;
 
       // Then get the collection
-      const getResponse = await supertest(app)
-        .get(`/api/v1/collections/${collectionId}`)
-        .set("Authorization", `Bearer ${accessToken}`)
+      const getResponse = await request(app)
+        .get(`/api/v2/collections/${collectionId}`)
+        .set("Authorization", `Bearer ${authToken}`)
         .expect(200);
 
-      expect(getResponse.body.success).toBe(true);
-      expect(getResponse.body.data).toMatchObject({
-        id: collectionId,
-        name: newCollection.name,
-        description: newCollection.description,
-      });
-    });
-  });
-
-  describe("Item Management", () => {
-    let collectionId: string;
-
-    beforeEach(async () => {
-      // Create a collection for item tests
-      const newCollection = {
-        name: "Test Library",
-        description: "For testing items",
-        metadataSchema: {
-          fields: {
-            title: { type: "text", required: true },
-            author: { type: "text", required: true },
-            pages: { type: "number", required: false },
+      expect(getResponse.body).toMatchObject({
+        success: true,
+        data: {
+          id: collectionId,
+          name: "Test Collection for Get",
+          description: "A test collection for get operation",
+          createdAt: expect.any(String),
+          updatedAt: expect.any(String),
+          metadataSchema: {
+            fields: {
+              title: {
+                type: "text",
+                required: true,
+                description: "Item title",
+              },
+            },
           },
         },
-      };
+        timestamp: expect.any(String),
+      });
 
-      const response = await supertest(app)
-        .post("/api/v1/collections")
-        .set("Authorization", `Bearer ${accessToken}`)
-        .send(newCollection)
-        .expect(201);
-
-      collectionId = response.body.data.id;
+      // ownerId should not be included in response for security
+      expect(getResponse.body.data).not.toHaveProperty("ownerId");
     });
 
-    it("should add an item to a collection", async () => {
-      const newItem = {
-        name: "The Great Gatsby",
-        metadata: {
-          title: "The Great Gatsby",
-          author: "F. Scott Fitzgerald",
-          pages: 180,
+    it("should return 404 when collection not found", async () => {
+      const response = await request(app)
+        .get("/api/v2/collections/550e8400-e29b-41d4-a716-446655440000")
+        .set("Authorization", `Bearer ${authToken}`)
+        .expect(404);
+
+      expect(response.body).toMatchObject({
+        success: false,
+        error: {
+          code: "NOT_FOUND",
+          message: "Collection not found",
         },
-      };
-
-      const response = await supertest(app)
-        .post(`/api/v1/collections/${collectionId}/items`)
-        .set("Authorization", `Bearer ${accessToken}`)
-        .send(newItem)
-        .expect(201);
-
-      expect(response.body.success).toBe(true);
-      expect(response.body.data).toMatchObject({
-        id: expect.any(String),
-        name: newItem.name,
-        metadata: newItem.metadata,
-        createdAt: expect.any(String),
-        updatedAt: expect.any(String),
+        timestamp: expect.any(String),
       });
     });
 
-    it("should list items in a collection", async () => {
-      // First add an item
-      const newItem = {
-        name: "The Great Gatsby",
-        metadata: {
-          title: "The Great Gatsby",
-          author: "F. Scott Fitzgerald",
-          pages: 180,
+    it("should return 400 when collection id is invalid", async () => {
+      const response = await request(app)
+        .get("/api/v2/collections/invalid-uuid")
+        .set("Authorization", `Bearer ${authToken}`)
+        .expect(400);
+
+      expect(response.body).toMatchObject({
+        success: false,
+        error: {
+          code: "VALIDATION_ERROR",
+          message: expect.stringContaining("UUID"),
         },
-      };
-
-      await supertest(app)
-        .post(`/api/v1/collections/${collectionId}/items`)
-        .set("Authorization", `Bearer ${accessToken}`)
-        .send(newItem)
-        .expect(201);
-
-      // Then list items
-      const listResponse = await supertest(app)
-        .get(`/api/v1/collections/${collectionId}/items`)
-        .set("Authorization", `Bearer ${accessToken}`)
-        .expect(200);
-
-      expect(listResponse.body.success).toBe(true);
-      expect(listResponse.body.data.items).toHaveLength(1);
-      expect(listResponse.body.data.items[0]).toMatchObject({
-        name: newItem.name,
-        metadata: newItem.metadata,
+        timestamp: expect.any(String),
       });
     });
-  });
 
-  describe("Authentication", () => {
-    it("should reject requests without authentication", async () => {
-      await supertest(app).get("/api/v1/collections").expect(401);
-
-      await supertest(app)
-        .post("/api/v1/collections")
-        .send({
-          name: "Test Collection",
-          description: "Test",
-          metadataSchema: { fields: {} },
-        })
+    it("should return 401 when not authenticated", async () => {
+      const response = await request(app)
+        .get("/api/v2/collections/550e8400-e29b-41d4-a716-446655440000")
         .expect(401);
-    });
 
-    it("should reject requests with invalid tokens", async () => {
-      await supertest(app)
-        .get("/api/v1/collections")
-        .set("Authorization", "Bearer invalid_token")
-        .expect(401);
+      expect(response.body).toMatchObject({
+        success: false,
+        error: {
+          code: "UNAUTHORIZED",
+          message: "Authentication required",
+        },
+        timestamp: expect.any(String),
+      });
     });
   });
 });

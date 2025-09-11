@@ -2,11 +2,10 @@ import type { Deps } from "../../../ports/Deps";
 import express from "express";
 import { buildHealthRoutes } from "./health";
 import { buildAuthRoutes } from "./auth";
+import { buildCollectionsRouter } from "./collections";
 
 // Collections route handlers
-import { makeCreateCollectionHandler } from "./makeCreateCollectionHandler";
 import { makeListCollectionsHandler } from "./makeListCollectionsHandler";
-import { makeGetCollectionHandler } from "./makeGetCollectionHandler";
 import { makeUpdateCollectionHandler } from "./makeUpdateCollectionHandler";
 import { makeDeleteCollectionHandler } from "./makeDeleteCollectionHandler";
 import { makeCreateItemHandler } from "./makeCreateItemHandler";
@@ -32,12 +31,20 @@ export const buildRoutes = (
   const authRouter = buildAuthRoutes(deps, authMiddleware);
   router.use(authRouter);
 
+  // Collections routes (new modular approach) - V2 API for demonstration
+  if (authMiddleware) {
+    const collectionsRouter = buildCollectionsRouter({
+      createCollection: deps.createCollection,
+      getCollection: deps.getCollection,
+    });
+    router.use("/api/v1/collections", authMiddleware, collectionsRouter);
+  }
+
   // Collections routes (protected)
   if (authMiddleware) {
     router.post(
       "/api/v1/collections",
       authMiddleware,
-      makeCreateCollectionHandler(deps),
     );
     router.get(
       "/api/v1/collections",
@@ -47,7 +54,6 @@ export const buildRoutes = (
     router.get(
       "/api/v1/collections/:id",
       authMiddleware,
-      makeGetCollectionHandler(deps),
     );
     router.put(
       "/api/v1/collections/:id",
