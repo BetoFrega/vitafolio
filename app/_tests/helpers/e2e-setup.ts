@@ -130,7 +130,7 @@ export async function setupE2ETest(): Promise<E2ETestContext> {
   });
 
   expect(loginResponse.status).toBe(200);
-  const accessToken = loginResponse.body.accessToken;
+  const accessToken = loginResponse.body.data.token;
 
   return {
     app,
@@ -235,11 +235,11 @@ export async function setupMultiUserE2ETest(): Promise<MultiUserE2ETestContext> 
     app,
     deps,
     userA: {
-      accessToken: loginResponseA.body.accessToken,
+      accessToken: loginResponseA.body.data.token,
       user: userA,
     },
     userB: {
-      accessToken: loginResponseB.body.accessToken,
+      accessToken: loginResponseB.body.data.token,
       user: userB,
     },
   };

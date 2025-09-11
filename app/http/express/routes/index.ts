@@ -1,9 +1,7 @@
 import type { Deps } from "../../../ports/Deps";
 import express from "express";
-import { makeUserRegistrationHandler } from "./makeUserRegistrationHandler";
-import { makeLoginHandler } from "./makeLoginHandler";
 import { buildHealthRoutes } from "./health";
-import type { AuthenticatedRequest } from "./shared/handlers/AuthenticatedHandler";
+import { buildAuthRoutes } from "./auth";
 
 // Collections route handlers
 import { makeCreateCollectionHandler } from "./makeCreateCollectionHandler";
@@ -30,24 +28,9 @@ export const buildRoutes = (
   const healthRouter = buildHealthRoutes();
   router.use(healthRouter);
 
-  // Authentication routes
-  router.post("/register", makeUserRegistrationHandler(deps));
-  router.post("/login", makeLoginHandler(deps));
-
-  // Debug endpoint to test auth
-  if (authMiddleware) {
-    router.get(
-      "/debug/auth",
-      authMiddleware,
-      (req: AuthenticatedRequest, res) => {
-        res.json({
-          message: "Authentication working",
-          user: req.user,
-          middlewarePresent: !!authMiddleware,
-        });
-      },
-    );
-  }
+  // Authentication routes (new modular approach)
+  const authRouter = buildAuthRoutes(deps, authMiddleware);
+  router.use(authRouter);
 
   // Collections routes (protected)
   if (authMiddleware) {

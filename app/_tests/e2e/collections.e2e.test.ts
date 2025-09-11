@@ -113,7 +113,7 @@ describe("Collections E2E Tests", () => {
     });
 
     expect(loginResponse.status).toBe(200);
-    accessToken = loginResponse.body.accessToken;
+    accessToken = loginResponse.body.data.token;
   });
 
   describe("Collection Management", () => {
