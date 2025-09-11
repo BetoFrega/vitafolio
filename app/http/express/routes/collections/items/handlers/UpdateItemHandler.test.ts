@@ -115,6 +115,7 @@ describe("UpdateItemHandler", () => {
   describe("Validation errors", () => {
     it("should return 401 when user is not authenticated", async () => {
       // Arrange
+      // @ts-expect-error - testing unauthenticated access
       mockRequest.user = undefined;
 
       // Act
