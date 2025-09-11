@@ -8,8 +8,8 @@ import type { UseCase } from "@shared/app/contracts/UseCase";
 export type Input = {
   itemId: string;
   ownerId: string;
-  name?: string;
-  metadata?: Record<string, string | number | Date | boolean>;
+  name?: string | undefined;
+  metadata?: Record<string, string | number | Date | boolean> | undefined;
 };
 
 export type Output = {
