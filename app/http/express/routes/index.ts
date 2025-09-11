@@ -36,6 +36,9 @@ export const buildRoutes = (
     const collectionsRouter = buildCollectionsRouter({
       createCollection: deps.createCollection,
       getCollection: deps.getCollection,
+      updateCollection: deps.updateCollection,
+      deleteCollection: deps.deleteCollection,
+      listCollections: deps.listCollections,
     });
     router.use("/api/v1/collections", authMiddleware, collectionsRouter);
   }
