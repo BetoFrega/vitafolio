@@ -9,7 +9,6 @@ export function makeExpressApp(deps: Deps) {
 
   // Create authentication middleware
   const authMiddleware = makeAuthenticationMiddleware(deps.tokenService);
-  console.log("Auth middleware created:", !!authMiddleware);
 
   const routes = buildRoutes(deps, authMiddleware);
   app.use(routes);
