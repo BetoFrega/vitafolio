@@ -9,7 +9,7 @@ import type { DeleteItem } from "@collections/app/DeleteItem";
  * Delete item dependencies interface
  */
 interface DeleteItemDeps {
-  deleteItem: DeleteItem;
+  deleteItem: Pick<DeleteItem, "execute">;
 }
 
 /**
@@ -54,7 +54,8 @@ export class DeleteItemHandler extends AuthenticatedHandler<void> {
       // Handle use case result
       if (result.isSuccess()) {
         // Return 204 No Content for successful deletion
-        return res.status(204).send();
+        res.status(204).send();
+        return;
       } else {
         const errorMessage = result.getError().message;
         // Check if it's a not found error

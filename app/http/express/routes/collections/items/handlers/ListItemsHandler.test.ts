@@ -10,7 +10,7 @@ const mockListItems = {
 };
 
 // Mock dependencies
-const mockDeps = {
+const mockDeps: ConstructorParameters<typeof ListItemsHandler>[0] = {
   listItems: mockListItems,
 };
 
@@ -18,8 +18,8 @@ describe("ListItemsHandler", () => {
   let handler: ListItemsHandler;
   let mockRequest: Partial<AuthenticatedRequest>;
   let mockResponse: Partial<Response>;
-  let responseJsonSpy: any;
-  let responseStatusSpy: any;
+  let responseJsonSpy: Response["json"];
+  let responseStatusSpy: Response["status"];
 
   beforeEach(() => {
     handler = new ListItemsHandler(mockDeps);
@@ -133,6 +133,7 @@ describe("ListItemsHandler", () => {
   describe("Validation errors", () => {
     it("should return 401 when user is not authenticated", async () => {
       // Arrange
+      // @ts-expect-error - testing unauthenticated access
       mockRequest.user = undefined;
 
       // Act

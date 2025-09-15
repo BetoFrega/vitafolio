@@ -10,7 +10,7 @@ const mockDeleteItem = {
 };
 
 // Mock dependencies
-const mockDeps = {
+const mockDeps: ConstructorParameters<typeof DeleteItemHandler>[0] = {
   deleteItem: mockDeleteItem,
 };
 
@@ -18,9 +18,9 @@ describe("DeleteItemHandler", () => {
   let handler: DeleteItemHandler;
   let mockRequest: Partial<AuthenticatedRequest>;
   let mockResponse: Partial<Response>;
-  let responseJsonSpy: any;
-  let responseStatusSpy: any;
-  let responseSendSpy: any;
+  let responseJsonSpy: Response["json"];
+  let responseStatusSpy: Response["status"];
+  let responseSendSpy: Response["send"];
 
   beforeEach(() => {
     handler = new DeleteItemHandler(mockDeps);
@@ -67,6 +67,7 @@ describe("DeleteItemHandler", () => {
   describe("Validation errors", () => {
     it("should return 401 when user is not authenticated", async () => {
       // Arrange
+      // @ts-expect-error - testing unauthenticated access
       mockRequest.user = undefined;
 
       // Act

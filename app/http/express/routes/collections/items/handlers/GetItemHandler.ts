@@ -21,7 +21,7 @@ interface GetItemResponseData {
  * Get item dependencies interface
  */
 interface GetItemDeps {
-  getItem: GetItem;
+  getItem: Pick<GetItem, "execute">;
 }
 
 /**

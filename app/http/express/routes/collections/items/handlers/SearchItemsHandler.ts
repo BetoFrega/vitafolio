@@ -52,7 +52,7 @@ interface SearchItemsResponseData {
  * Search items dependencies interface
  */
 interface SearchItemsDeps {
-  searchItems: SearchItems;
+  searchItems: Pick<SearchItems, "execute">;
 }
 
 /**
@@ -78,7 +78,7 @@ export class SearchItemsHandler extends AuthenticatedHandler<SearchItemsResponse
       // Validate query parameters
       const validationResult = RequestValidator.validateQuery(
         SearchItemsQuerySchema,
-        req,
+        { query: req.query as Record<string, string | string[] | undefined> },
       );
       if (!validationResult.isSuccess()) {
         return this.sendError(

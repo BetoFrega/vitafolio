@@ -16,12 +16,12 @@ import type { SearchItems } from "@collections/app/SearchItems";
  * Items dependencies interface
  */
 export interface ItemsDeps {
-  addItemToCollection: AddItemToCollection;
-  getItem: GetItem;
-  updateItem: UpdateItem;
-  deleteItem: DeleteItem;
-  listItems: ListItems;
-  searchItems: SearchItems;
+  addItemToCollection: Pick<AddItemToCollection, "execute">;
+  getItem: Pick<GetItem, "execute">;
+  updateItem: Pick<UpdateItem, "execute">;
+  deleteItem: Pick<DeleteItem, "execute">;
+  listItems: Pick<ListItems, "execute">;
+  searchItems: Pick<SearchItems, "execute">;
 }
 
 /**

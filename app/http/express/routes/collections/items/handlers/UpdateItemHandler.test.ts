@@ -10,7 +10,7 @@ const mockUpdateItem = {
 };
 
 // Mock dependencies
-const mockDeps = {
+const mockDeps: ConstructorParameters<typeof UpdateItemHandler>[0] = {
   updateItem: mockUpdateItem,
 };
 
@@ -18,8 +18,8 @@ describe("UpdateItemHandler", () => {
   let handler: UpdateItemHandler;
   let mockRequest: Partial<AuthenticatedRequest>;
   let mockResponse: Partial<Response>;
-  let responseJsonSpy: any;
-  let responseStatusSpy: any;
+  let responseJsonSpy: Response["json"];
+  let responseStatusSpy: Response["status"];
 
   beforeEach(() => {
     handler = new UpdateItemHandler(mockDeps);

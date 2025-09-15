@@ -35,7 +35,7 @@ interface UpdateItemResponseData {
  * Update item dependencies interface
  */
 interface UpdateItemDeps {
-  updateItem: UpdateItem;
+  updateItem: Pick<UpdateItem, "execute">;
 }
 
 /**

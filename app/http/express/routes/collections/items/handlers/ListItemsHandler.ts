@@ -29,7 +29,7 @@ interface ListItemsResponseData {
  * List items dependencies interface
  */
 interface ListItemsDeps {
-  listItems: ListItems;
+  listItems: Pick<ListItems, "execute">;
 }
 
 /**

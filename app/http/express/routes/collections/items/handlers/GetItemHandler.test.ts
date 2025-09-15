@@ -10,7 +10,7 @@ const mockGetItem = {
 };
 
 // Mock dependencies
-const mockDeps = {
+const mockDeps: ConstructorParameters<typeof GetItemHandler>[0] = {
   getItem: mockGetItem,
 };
 
@@ -18,8 +18,8 @@ describe("GetItemHandler", () => {
   let handler: GetItemHandler;
   let mockRequest: Partial<AuthenticatedRequest>;
   let mockResponse: Partial<Response>;
-  let responseJsonSpy: any;
-  let responseStatusSpy: any;
+  let responseJsonSpy: Response["json"];
+  let responseStatusSpy: Response["status"];
 
   beforeEach(() => {
     handler = new GetItemHandler(mockDeps);
@@ -81,6 +81,7 @@ describe("GetItemHandler", () => {
   describe("Validation errors", () => {
     it("should return 401 when user is not authenticated", async () => {
       // Arrange
+      // @ts-expect-error - testing unauthenticated access
       mockRequest.user = undefined;
 
       // Act

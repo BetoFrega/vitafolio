@@ -7,7 +7,6 @@ import {
 import { RequestValidator } from "../../../shared/validation/RequestValidator";
 import type {
   AddItemToCollection,
-  Input as AddItemInput,
 } from "@collections/app/AddItemToCollection";
 
 /**
@@ -37,7 +36,7 @@ interface CreateItemResponseData {
  * Create item dependencies interface
  */
 interface CreateItemDeps {
-  addItemToCollection: AddItemToCollection;
+  addItemToCollection: Pick<AddItemToCollection, "execute">;
 }
 
 /**
