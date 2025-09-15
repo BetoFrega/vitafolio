@@ -20,6 +20,20 @@ export default defineConfig([
     extends: ["json/recommended"],
   },
   {
+    files: [
+      "**/*.jsonc",
+      ".vscode/*.json",
+      ".vscode/*.jsonc",
+      "*.code-workspace",
+      ".devcontainer/*.json",
+      ".devcontainer/*.jsonc",
+    ],
+    language: "json/jsonc",
+    rules: {
+      "json/no-duplicate-keys": "error",
+    },
+  },
+  {
     files: ["**/*.jsonc"],
     plugins: { json },
     language: "json/jsonc",

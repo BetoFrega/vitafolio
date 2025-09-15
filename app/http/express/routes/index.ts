@@ -3,6 +3,7 @@ import express from "express";
 import { buildHealthRoutes } from "./health";
 import { buildAuthRoutes } from "./auth";
 import { buildCollectionsRouter } from "./collections";
+import { buildItemsRouter } from "./collections/items";
 
 // Collections route handlers
 import { makeListCollectionsHandler } from "./makeListCollectionsHandler";
@@ -41,6 +42,17 @@ export const buildRoutes = (
       listCollections: deps.listCollections,
     });
     router.use("/api/v1/collections", authMiddleware, collectionsRouter);
+
+    // Items routes (new class-based approach) - mounted under /api/v1 for parallel operation
+    const itemsRouter = buildItemsRouter({
+      addItemToCollection: deps.addItemToCollection,
+      getItem: deps.getItem,
+      updateItem: deps.updateItem,
+      deleteItem: deps.deleteItem,
+      listItems: deps.listItems,
+      searchItems: deps.searchItems,
+    });
+    router.use("/api/v1", authMiddleware, itemsRouter);
   }
 
   // Collections routes (protected)
