@@ -48,6 +48,18 @@ Dependency inversion through abstractions:
 - **Async operations** for all data access
 - **Mock dependencies** using vi.fn() for isolated unit tests
 
+### VI. English Language Standard (NON-NEGOTIABLE)
+
+All project artifacts must be written in English:
+
+- **Code**: Variable names, function names, class names, comments
+- **Documentation**: README files, API docs, architecture documents
+- **Tests**: Test descriptions, test file names, error messages
+- **Git commits**: Commit messages and branch names
+- **Configuration**: Config files, environment variables, scripts
+
+_Note: Human communication with AI assistants may be in any language, but all generated artifacts must be in English._
+
 ## Development Standards
 
 ### Code Quality Requirements

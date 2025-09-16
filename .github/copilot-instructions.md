@@ -1,5 +1,17 @@
 # Vitafolio - AI Coding Agent Instructions
 
+## ⚠️ REQUIRED: English Language Standard
+
+**ALL PROJECT ARTIFACTS MUST BE WRITTEN IN ENGLISH:**
+
+- **Code**: Variables, functions, classes, interfaces, comments
+- **Documentation**: All markdown files, README, API docs
+- **Tests**: Test descriptions, file names, error messages
+- **Git**: Commit messages, branch names, PR descriptions
+- **Configuration**: Config files, scripts, environment variables
+
+_Note: Human communication with AI may be in any language, but all generated content must be in English._
+
 ## ⚠️ REQUIRED: Test-Driven Development (TDD)
 
 **ALL CODE CHANGES MUST FOLLOW TDD PRINCIPLES:**
