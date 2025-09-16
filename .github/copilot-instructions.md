@@ -66,26 +66,41 @@
 ### Testing Principles
 
 - **Use the test tool** for running tests - do NOT use terminal commands like `pnpm test` or `vitest run`. If the test tool is not available, please notify the team to set it up.
+- **Follow the Test Pyramid** - Many unit tests, some integration tests, few E2E tests
 - **Mock dependencies** using `vi.fn()` for unit tests
 - **Test behavior, not implementation** - focus on inputs/outputs
 - **Arrange-Act-Assert** pattern for test structure
 
-### App Layer Test Types (See `app/_tests/TEST_STRATEGY.md` for complete guide)
+### Test Pyramid Strategy
 
-1. **Health Tests** (`*.test.ts`): Basic service availability without dependencies
-2. **Integration Tests** (`*.integration.test.ts`): Multi-component workflow testing
-   - Complete business scenarios across multiple endpoints
-   - Test workflow consistency and data integrity
-3. **E2E Tests** (`*.e2e.test.ts`): Full system testing with real implementations
-   - Real repository and service instances
-   - Complete authentication flows
-   - Final pre-deployment verification
+Following the test pyramid for optimal speed, reliability, and maintainability:
+
+#### **1. Unit Tests (70-80% of tests)** - `*.test.ts`
+
+- **Domain entities and value objects** - Test creation, validation, and business logic
+- **Use case logic** - Test with mocked dependencies
+- **Pure functions** - Test isolated business logic
+- **Fast execution** (milliseconds) and **low maintenance cost**
+
+#### **2. Integration Tests (15-25% of tests)** - `*.integration.test.ts`
+
+- **Multi-component workflows** - Test use cases with real dependencies where feasible
+- **Business scenario validation** - Complete workflows across multiple components
+- **Data flow integrity** - Ensure proper data transformation between layers
+- **Moderate execution speed** (seconds) and **medium maintenance cost**
+
+#### **3. E2E Tests (5-10% of tests)** - `*.e2e.test.ts`
+
+- **Complete user flows** - Full system testing with real implementations
+- **HTTP API endpoints** - Test authentication, authorization, and complete request/response cycles
+- **Critical path validation** - Essential business workflows only
+- **Slower execution** (minutes) but **high confidence in system behavior**
 
 ### Test Organization
 
 - **Domain tests**: Entity creation, validation, and behavior (`.test.ts` alongside implementation)
 - **Use case tests**: Mock dependencies and test complete workflows
-- **App layer tests**: Four-tier strategy (health → contract → integration → e2e)
+- **App layer tests**: Three-tier strategy (unit → integration → e2e)
 - **Test helpers**: Centralized mock creation in `helpers/` directory
 
 ### TDD Test Workflow
