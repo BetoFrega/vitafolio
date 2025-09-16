@@ -12,7 +12,7 @@
 
 - **Never write production code without a failing test**
 - **Tests must be written BEFORE implementation**
-- **Run tests frequently** (use testing tools) to ensure nothing breaks
+- **Run tests frequently** using the available test tool (NOT terminal commands) to ensure nothing breaks
 - **All tests must pass** before committing changes
 - **Test file names**:
   - Domain/Use Case tests: `.test.ts` alongside implementation files
@@ -65,7 +65,7 @@
 
 ### Testing Principles
 
-- **Use testing tools** for running tests (preferred over terminal commands)
+- **Use the test tool** for running tests - do NOT use terminal commands like `pnpm test` or `vitest run`. If the test tool is not available, please notify the team to set it up.
 - **Mock dependencies** using `vi.fn()` for unit tests
 - **Test behavior, not implementation** - focus on inputs/outputs
 - **Arrange-Act-Assert** pattern for test structure
@@ -100,7 +100,7 @@
 
 - **Build**: `pnpm run typecheck`
 - **Development**: `pnpm run dev`
-- **Test**: Use testing tools (preferred) or `pnpm test`
+- **Test**: Use the test tool (do NOT use `pnpm test` or other terminal commands)
 - **TDD Cycle**: Write test → Run test (fail) → Implement → Run test (pass) → Refactor
 
 ### Project Structure
