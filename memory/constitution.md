@@ -26,7 +26,7 @@ TDD mandatory with Red-Green-Refactor cycle strictly enforced:
 Rich domain models with behavior and validation:
 
 - **Value Objects (VOs)**: Strictly immutable, identified by values not identity, private constructors, static factory methods, all properties readonly, no mutating methods. Any change returns a new VO.
-- **Aggregates & Aggregate Roots**: Mutable state, stable identity, public command methods mutate internal state and validate invariants, no recreation of aggregate on command, only business methods exposed, no generic setters.
+- **Aggregates & Aggregate Roots**: Mutable state, stable identity, public command methods mutate internal state and validate invariants, no recreation of aggregate on command, only business methods exposed, no generic setters. Internal state is not directly mutable from outside the aggregate; fields are private and exposed via read-only accessors.
 - **Aggregates**: Consistency boundaries with invariant enforcement.
 - **Ubiquitous language**: Code reflects business terminology exactly.
 
@@ -69,6 +69,13 @@ _Note: Human communication with AI assistants may be in any language, but all ge
 - **Feature-based organization** by domain/business capability
 - **Immutable data structures for VOs only**: Use `readonly` for Value Objects. Aggregates are mutable and should not use universal immutability.
 - **PascalCase** for classes/interfaces, **camelCase** for methods/properties
+
+### Aggregate Encapsulation Rules
+
+- All aggregate fields MUST be `private` and mutated only by domain-specific command methods.
+- Expose read-only views: getters may return primitives or read-only views (`ReadonlyArray<T>`, `ReadonlyMap<K,V>`), never direct mutable references.
+- Use defensive copies when returning complex structures to prevent outside mutation.
+- Validate invariants before any mutation and optionally raise domain events or return a `Result`.
 
 ### Testing Standards
 

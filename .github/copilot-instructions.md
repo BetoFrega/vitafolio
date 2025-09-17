@@ -58,6 +58,14 @@ _Note: Human communication with AI may be in any language, but all generated con
 - **No recreation on command**: Command methods do not return a new aggregate instance; they mutate the existing one and may return `void`, a `Result`, or domain events.
 - **No generic setters**: Only domain-specific business methods are exposed for mutation; public getters for read-only access.
 
+#### Aggregate encapsulation (strict)
+
+- Internal state is not mutable from the outside: all fields are `private` and state can only change via domain-specific command methods.
+- Expose read-only accessors only: getters should not return mutable references to internal collections or objects.
+- Defensive copies or read-only views: when exposing collections, return `ReadonlyArray<T>`, `ReadonlyMap<K, V>`, or a cloned/immutable snapshot to avoid external mutation.
+- Do not leak references: never return or store externally any direct references to internal arrays, maps, or objects that could be mutated outside the aggregate.
+- Validation first: each command method validates invariants before mutating internal state and may emit domain events or return a Result.
+
 ### Repository Pattern
 
 - **Works with mutable aggregates**: Repositories persist and retrieve aggregates as mutable objects, not clones or copies.
