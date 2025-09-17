@@ -6,7 +6,7 @@
 
 Clean Architecture pattern strictly enforced with clear layer separation:
 
-- **Domain layer**: Pure business logic, no external dependencies, immutable entities with private constructors and static factory methods
+- **Domain layer**: Pure business logic, no external dependencies. Value Objects (VOs) are strictly immutable (private constructors, static factories, readonly properties). Aggregates and Aggregate Roots are mutable, with public command methods that mutate internal state and validate invariants. No universal immutability for aggregates.
 - **Application layer**: Use cases implementing business workflows, dependency injection via Pick<> utility types
 - **Infrastructure layer**: Adapters implementing ports, external dependencies isolated here
 - **Dependency rule**: Inner layers never depend on outer layers
@@ -25,10 +25,10 @@ TDD mandatory with Red-Green-Refactor cycle strictly enforced:
 
 Rich domain models with behavior and validation:
 
-- **Entities**: Immutable data with Object.freeze(), rich domain behavior, private constructors
-- **Value objects**: Identified by values not identity, validation in static factory methods
-- **Aggregates**: Consistency boundaries with invariant enforcement
-- **Ubiquitous language**: Code reflects business terminology exactly
+- **Value Objects (VOs)**: Strictly immutable, identified by values not identity, private constructors, static factory methods, all properties readonly, no mutating methods. Any change returns a new VO.
+- **Aggregates & Aggregate Roots**: Mutable state, stable identity, public command methods mutate internal state and validate invariants, no recreation of aggregate on command, only business methods exposed, no generic setters.
+- **Aggregates**: Consistency boundaries with invariant enforcement.
+- **Ubiquitous language**: Code reflects business terminology exactly.
 
 ### IV. Result Pattern Error Handling
 
@@ -67,7 +67,7 @@ _Note: Human communication with AI assistants may be in any language, but all ge
 - **TypeScript strict mode** with ESNext modules and noEmit type checking
 - **Path aliases** for clean imports (@shared/, @iam/, @domain/)
 - **Feature-based organization** by domain/business capability
-- **Immutable data structures** with readonly properties
+- **Immutable data structures for VOs only**: Use `readonly` for Value Objects. Aggregates are mutable and should not use universal immutability.
 - **PascalCase** for classes/interfaces, **camelCase** for methods/properties
 
 ### Testing Standards

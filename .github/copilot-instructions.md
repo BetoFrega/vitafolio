@@ -37,39 +37,39 @@ _Note: Human communication with AI may be in any language, but all generated con
 
 **Clean Architecture Pattern**: Domain → Application → Infrastructure layers
 
-- `domain/` - Domain entities with immutable data structures
+- `domain/` - Domain entities (Aggregates, Aggregate Roots, Value Objects)
 - `app/` - Application use cases implementing business workflows
 - `ports/` - Infrastructure ports (repository interfaces) for external dependencies
 - `adapters/` - Infrastructure implementations of ports
 
 ## Core Design Principles
 
-### Domain Entities
+### Value Objects (VOs)
 
-- **Private constructors** with static factory methods (`create()`, `fromData()`)
-- **Immutable data** with readonly properties and `Object.freeze()`
-- **Rich domain behavior** - methods that operate on entity data
-- **No external dependencies** - pure domain logic only
+- **Strictly immutable**: All properties are `readonly` (or equivalent), no setters or mutating methods.
+- **Private constructors** with validation in static factory methods (`create()`, `fromData()`).
+- **Any change returns a new VO**; never mutate an existing instance.
+- **No identity**: Equality is based on value, not reference.
 
-### Value Objects
+### Aggregates & Aggregate Roots
 
-- **Immutable objects** with no identity (identified by their values)
-- **Private constructors** with validation in static factory methods
-- **Rich behavior** and domain logic encapsulation
-- **Equality comparison** based on values, not reference
-
-### Use Cases
-
-- **Single responsibility** - one business workflow per use case
-- **Dependency injection** via constructor with `Pick<>` utility types
-- **Result pattern** for error handling (`Result.success()` / `Result.failure()`)
-- **Interface-based dependencies** for testability
+- **Mutable state**: Aggregates have stable identity and their internal state can change over time.
+- **Command methods**: Business methods (e.g., `changeEmail`, `approve`, `cancel`) directly mutate the internal state, validating invariants before mutation.
+- **No recreation on command**: Command methods do not return a new aggregate instance; they mutate the existing one and may return `void`, a `Result`, or domain events.
+- **No generic setters**: Only domain-specific business methods are exposed for mutation; public getters for read-only access.
 
 ### Repository Pattern
 
-- **Interface-based design** for testability and dependency inversion
-- **Async operations** for all data access
-- **Domain-focused contracts** - repositories serve domain needs
+- **Works with mutable aggregates**: Repositories persist and retrieve aggregates as mutable objects, not clones or copies.
+- **Unit of persistence**: Repositories guarantee the persistence of the entire aggregate as a unit.
+- **Concurrency control**: Use a `version` property or similar for optimistic concurrency.
+
+### Use Cases
+
+- **Single responsibility**: One business workflow per use case.
+- **Dependency injection** via constructor with `Pick<>` utility types.
+- **Result pattern** for error handling (`Result.success()` / `Result.failure()`).
+- **Interface-based dependencies** for testability.
 
 ## Testing Strategy
 
@@ -171,7 +171,7 @@ vitafolio/
 ## Common Patterns to Follow
 
 - **Static factory methods** for object creation with validation
-- **Immutable data structures** with `readonly` and `Object.freeze()`
+- **Immutable data structures for VOs only**: Use `readonly` and `Object.freeze()` for Value Objects. Aggregates are mutable and should not use universal immutability.
 - **Interface segregation** using `Pick<>` for dependency injection
 - **Result pattern** instead of throwing exceptions in business logic
 - **Value objects** for domain concepts that need validation and behavior
