@@ -8,7 +8,7 @@ import type { MetadataSchema } from "../value-objects/MetadataSchema";
 
 export class Item {
   private constructor(
-    public readonly data: {
+    public readonly data: Readonly<{
       id: ItemId;
       name: string;
       collectionId: CollectionId;
@@ -16,7 +16,7 @@ export class Item {
       metadata: MetadataValues;
       createdAt: Date;
       updatedAt: Date;
-    },
+    }>,
   ) {
     Object.freeze(this.data);
   }

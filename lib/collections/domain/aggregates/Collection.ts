@@ -3,7 +3,7 @@ import { MetadataSchema } from "../value-objects/MetadataSchema";
 
 export class Collection {
   private constructor(
-    public readonly data: {
+    public readonly data: Readonly<{
       id: CollectionId;
       name: string;
       description: string;
@@ -11,7 +11,7 @@ export class Collection {
       metadataSchema: MetadataSchema;
       createdAt: Date;
       updatedAt: Date;
-    },
+    }>,
   ) {
     Object.freeze(this.data);
   }

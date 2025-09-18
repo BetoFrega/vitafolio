@@ -10,7 +10,7 @@ export type NotificationMetadata = Record<
 
 export class Notification {
   private constructor(
-    public readonly data: {
+    public readonly data: Readonly<{
       id: NotificationId;
       userId: string; // UserId from IAM domain
       itemId: ItemId;
@@ -22,7 +22,7 @@ export class Notification {
       metadata: NotificationMetadata; // Additional notification-specific data
       createdAt: Date;
       updatedAt: Date;
-    },
+    }>,
   ) {
     Object.freeze(this.data);
   }
