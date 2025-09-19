@@ -13,9 +13,6 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
-      "@shared": path.resolve(__dirname, "../lib/shared"),
-      "@iam": path.resolve(__dirname, "../lib/iam"),
-      "@collections": path.resolve(__dirname, "../lib/collections"),
     },
   },
   server: {
