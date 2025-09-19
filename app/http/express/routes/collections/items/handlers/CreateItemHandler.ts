@@ -5,9 +5,7 @@ import {
   type AuthenticatedRequest,
 } from "../../../shared/handlers/AuthenticatedHandler";
 import { RequestValidator } from "../../../shared/validation/RequestValidator";
-import type {
-  AddItemToCollection,
-} from "@collections/app/AddItemToCollection";
+import type { AddItemToCollection } from "@collections/app/AddItemToCollection";
 
 /**
  * Create item request schema for validation

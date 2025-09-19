@@ -15,22 +15,25 @@ export type Output = {
 };
 
 export class Login implements UseCase<Input, Output> {
-  constructor(private deps: {
-    tokenService: TokenService;
-    hashService: Pick<HashService, "verify">;
-    userRepository: Pick<UserRepository, "findByEmail">;
-  }) {
-  }
+  constructor(
+    private deps: {
+      tokenService: TokenService;
+      hashService: Pick<HashService, "verify">;
+      userRepository: Pick<UserRepository, "findByEmail">;
+    },
+  ) {}
 
   async execute(input: Input): Promise<Result<Output>> {
     const { email, password } = input;
     const user = await this.deps.userRepository.findByEmail(email);
-    const passwordHash = user?.data.hashedPassword ?? "$2b$10$invalidsaltstring22charsmin";
-    const isPasswordValid = await this.deps.hashService.verify(password, passwordHash);
+    const passwordHash =
+      user?.data.hashedPassword ?? "$2b$10$invalidsaltstring22charsmin";
+    const isPasswordValid = await this.deps.hashService.verify(
+      password,
+      passwordHash,
+    );
     if (!user || !isPasswordValid) {
-        return Result.failure(
-            new Error("Authentication failed"),
-        );
+      return Result.failure(new Error("Authentication failed"));
     }
     const accessToken = await this.deps.tokenService.generateAccessToken({
       userId: user.data.id,
@@ -39,8 +42,8 @@ export class Login implements UseCase<Input, Output> {
       userId: user.data.id,
     });
     return Result.success({
-        accessToken,
-        refreshToken,
+      accessToken,
+      refreshToken,
     });
   }
 }

@@ -20,7 +20,7 @@ describe("ListCollectionsHandler", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    
+
     handler = new ListCollectionsHandler({
       listCollections: mockListCollections,
     });
@@ -161,9 +161,11 @@ describe("ListCollectionsHandler", () => {
       );
 
       expect(responseSpy.status).toHaveBeenCalledWith(200);
-      
+
       const responseData = responseSpy.json.mock.calls[0]?.[0];
-      expect(responseData?.data?.collections?.[0]).toHaveProperty("metadataSchema");
+      expect(responseData?.data?.collections?.[0]).toHaveProperty(
+        "metadataSchema",
+      );
       expect(responseData?.data?.collections?.[0]?.metadataSchema).toEqual({
         fields: {
           title: {
@@ -206,7 +208,9 @@ describe("ListCollectionsHandler", () => {
       );
 
       // Mock console.error to avoid test output noise
-      const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+      const consoleSpy = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
 
       await handler.handle(
         mockRequest as AuthenticatedRequest,

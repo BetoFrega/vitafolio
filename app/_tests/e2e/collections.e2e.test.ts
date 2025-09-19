@@ -454,7 +454,9 @@ describe("Collections E2E Tests", () => {
       });
 
       // Should have at least the 2 collections we created
-      expect(listResponse.body.data.collections.length).toBeGreaterThanOrEqual(2);
+      expect(listResponse.body.data.collections.length).toBeGreaterThanOrEqual(
+        2,
+      );
 
       // ownerId should not be included in response for security
       listResponse.body.data.collections.forEach((collection: any) => {

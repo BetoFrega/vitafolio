@@ -21,7 +21,7 @@ describe("DeleteCollectionHandler", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    
+
     handler = new DeleteCollectionHandler({
       deleteCollection: mockDeleteCollection,
     });
@@ -160,7 +160,9 @@ describe("DeleteCollectionHandler", () => {
       );
 
       // Mock console.error to avoid test output noise
-      const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+      const consoleSpy = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
 
       await handler.handle(
         mockRequest as AuthenticatedRequest,

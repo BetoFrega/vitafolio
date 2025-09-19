@@ -58,7 +58,7 @@ export class ListCollectionsHandler extends AuthenticatedHandler<ListCollections
       // Handle use case result
       if (result.isSuccess()) {
         const data = result.getValue();
-        
+
         // Transform collections to remove ownerId for security/privacy
         const sanitizedCollections = data.collections.map((collection: any) => {
           const { ownerId, ...sanitizedCollection } = collection;
@@ -68,7 +68,7 @@ export class ListCollectionsHandler extends AuthenticatedHandler<ListCollections
         const responseData = {
           collections: sanitizedCollections,
         };
-        
+
         return this.sendSuccess(res, responseData, 200);
       } else {
         return this.sendError(

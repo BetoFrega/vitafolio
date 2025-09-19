@@ -67,13 +67,11 @@ export function buildItemsRouter(deps: ItemsDeps): express.Router {
   );
 
   // Collection-based item routes
-  router.post(
-    "/collections/:collectionId/items",
-    (req, res) => createItemHandler.handle(req, res),
+  router.post("/collections/:collectionId/items", (req, res) =>
+    createItemHandler.handle(req, res),
   );
-  router.get(
-    "/collections/:collectionId/items",
-    (req, res) => listItemsHandler.handle(req, res),
+  router.get("/collections/:collectionId/items", (req, res) =>
+    listItemsHandler.handle(req, res),
   );
 
   // Item-specific routes (after search to avoid conflicts)

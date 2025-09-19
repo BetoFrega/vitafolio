@@ -20,7 +20,7 @@ describe("UpdateCollectionHandler", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    
+
     handler = new UpdateCollectionHandler({
       updateCollection: mockUpdateCollection,
     });
@@ -246,7 +246,9 @@ describe("UpdateCollectionHandler", () => {
       );
 
       // Mock console.error to avoid test output noise
-      const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+      const consoleSpy = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
 
       await handler.handle(
         mockRequest as AuthenticatedRequest,

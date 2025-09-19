@@ -39,10 +39,10 @@ describe("Items Router", () => {
     app = express();
     app.use(express.json());
     app.use(mockAuthMiddleware);
-    
+
     const itemsRouter = buildItemsRouter(mockDeps);
     app.use("/api/v1", itemsRouter);
-    
+
     // Clear all mocks
     Object.values(mockDeps).forEach((dep) => {
       vi.clearAllMocks();
@@ -189,7 +189,9 @@ describe("Items Router", () => {
         ],
         total: 1,
       };
-      mockDeps.searchItems.execute.mockResolvedValue(Result.success(searchData));
+      mockDeps.searchItems.execute.mockResolvedValue(
+        Result.success(searchData),
+      );
 
       // Act
       const response = await request(app).get(
